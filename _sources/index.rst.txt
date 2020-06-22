@@ -1,0 +1,64 @@
+.. hazus documentation master file, created by
+   sphinx-quickstart on Mon Nov  4 11:45:27 2019.
+   You can adapt this file completely to your liking, but it should at least
+   contain the root `toctree` directive.
+
+HazPy - Natural hazard risk assessment using Python
+=================================
+
+.. toctree::
+    :maxdepth: 4
+    :caption: Contents:
+
+
+Instructions
+-----------
+
+Install
+^^^^
+*Conda (recommended):*
+
+HazPy uses many libraries under the hood to perform geospatial, database, and dataframe operations.
+This is why we recommend an installation of Anaconda 3.X prior to usage (https://www.anaconda.com/distribution/). 
+
+.. code-block::
+
+    conda install -c nhrap hazpy
+
+* https://anaconda.org/nhrap/hazpy
+
+*Pip:*
+
+.. code-block::
+
+    pip install hazpy
+
+* https://pypi.org/project/hazpy/
+
+*GitHub*
+
+* https://github.com/nhrap-hazpy
+
+Modules
+-----------
+
+Legacy
+^^^^^
+.. toctree::
+    :glob:
+
+    Legacy/*
+
+Flood
+^^^^^
+.. toctree::
+    :glob:
+
+    Flood/*
+
+Common
+^^^^^
+.. toctree::
+    :glob:
+
+    common/*

@@ -1,0 +1,828 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Legacy &mdash; hazpy 0.0.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Flood" href="../Flood/index.html" />
+    <link rel="prev" title="HazPy - Natural hazard risk assessment using Python" href="../index.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> hazpy
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Legacy</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#methods">Methods</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#getstudyregions">getStudyRegions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#createexportobj">createExportObj</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#export">export</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#classes">Classes</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#hazusdb">HazusDB</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#studyregion">StudyRegion</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#studyregiondataframe">StudyRegionDataFrame</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#exporting">Exporting</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../Flood/index.html">Flood</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../common/index.html">Common</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">hazpy</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+      <li>Legacy</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/Legacy/index.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="legacy">
+<h1>Legacy<a class="headerlink" href="#legacy" title="Permalink to this headline">¶</a></h1>
+<div class="toctree-wrapper compound">
+</div>
+<p>HazPy Legacy methods and classes. This module interacts with and builds upon the hazpy Legacy desktop software.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">hazpy</span><span class="o">.</span><span class="n">legacy</span>
+</pre></div>
+</div>
+<div class="section" id="methods">
+<h2>Methods<a class="headerlink" href="#methods" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="getstudyregions">
+<h3>getStudyRegions<a class="headerlink" href="#getstudyregions" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="hazpy.legacy.getStudyRegions">
+<code class="sig-prename descclassname">legacy.</code><code class="sig-name descname">getStudyRegions</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#hazpy.legacy.getStudyRegions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets all study region names imported into your local Hazus install</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>studyRegions: list – study region names</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="field-list simple">
+<dt class="field-odd">members</dt>
+<dd class="field-odd"><p></p></dd>
+</dl>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># get list of study regions</span>
+<span class="n">studyRegions</span> <span class="o">=</span> <span class="n">hazpy</span><span class="o">.</span><span class="n">legacy</span><span class="o">.</span><span class="n">getStudyRegions</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="createexportobj">
+<h3>createExportObj<a class="headerlink" href="#createexportobj" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="hazpy.legacy.createExportObj">
+<code class="sig-prename descclassname">legacy.</code><code class="sig-name descname">createExportObj</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#hazpy.legacy.createExportObj" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a dictionary to be used in the hazus.legacy.export method and hazus.legacy.Exporting class</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>exportObj: dict – opt fields are boolean and decide options for exports. The rest of the fields are strings.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="field-list simple">
+<dt class="field-odd">members</dt>
+<dd class="field-odd"><p></p></dd>
+</dl>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># create a template export object</span>
+<span class="n">exportObject</span> <span class="o">=</span> <span class="n">hazpy</span><span class="o">.</span><span class="n">legacy</span><span class="o">.</span><span class="n">createExportObj</span><span class="p">()</span>
+
+<span class="c1"># modify required keys</span>
+<span class="n">exportObject</span><span class="p">[</span><span class="s1">&#39;study_region&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;My_Eq_StudyRegionName&#39;</span> <span class="c1"># set the study region to export</span>
+<span class="n">exportObject</span><span class="p">[</span><span class="s1">&#39;output_directory&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;C:\Users\user\disasters\event&#39;</span> <span class="c1"># set the directory for the output files</span>
+
+<span class="c1"># modify what you will export (True will export and False will not export)</span>
+<span class="n">exportObject</span><span class="p">[</span><span class="s1">&#39;opt_csv&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span> <span class="c1"># export data as CSVs</span>
+<span class="n">exportObject</span><span class="p">[</span><span class="s1">&#39;opt_shp&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span> <span class="c1"># export data as Shapefiles</span>
+<span class="n">exportObject</span><span class="p">[</span><span class="s1">&#39;opt_report&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span> <span class="c1"># export high level report</span>
+<span class="n">exportObject</span><span class="p">[</span><span class="s1">&#39;opt_json&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span> <span class="c1"># export data as json</span>
+
+<span class="c1"># modify optional report keys</span>
+<span class="n">exportObject</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Kiholo Earthquake M6.4&#39;</span> <span class="c1"># report title</span>
+<span class="n">exportObject</span><span class="p">[</span><span class="s1">&#39;meta&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Shakemap version 5 US&#39;</span> <span class="c1"># subtitle/meta data for the report</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="export">
+<h3>export<a class="headerlink" href="#export" title="Permalink to this headline">¶</a></h3>
+<dl class="method">
+<dt id="hazpy.legacy.export">
+<code class="sig-prename descclassname">legacy.</code><code class="sig-name descname">export</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#hazpy.legacy.export" title="Permalink to this definition">¶</a></dt>
+<dd><p>Exports data from Hazus legacy. Can export CSVs, Shapefiles, PDF Reports, and Json</p>
+<p>Use hazus.legacy.createExportObj() to create a base object for keyword arguments</p>
+<dl>
+<dt>Keyword arguments:</dt><dd><p>exportObj: dictionary – {</p>
+<blockquote>
+<div><p>opt_csv: boolean – export CSVs,</p>
+<p>opt_shp: boolean – export Shapefile(s),</p>
+<p>opt_report: boolean – export report,</p>
+<p>opt_json: boolean – export Json,</p>
+<p>study_region: str – name of the Hazus study region (HPR name),</p>
+<p>?title: str – title on the report,</p>
+<p>?meta: str – sub-title on the report (ex: Shakemap v5),</p>
+<p>output_directory: str – directory location for the outputs</p>
+</div></blockquote>
+<p>}</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="field-list simple">
+<dt class="field-odd">members</dt>
+<dd class="field-odd"><p></p></dd>
+</dl>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># set up export object</span>
+<span class="n">studyRegions</span> <span class="o">=</span> <span class="n">hazpy</span><span class="o">.</span><span class="n">legacy</span><span class="o">.</span><span class="n">getStudyRegions</span><span class="p">()</span> <span class="c1"># get all study regions</span>
+<span class="n">exportObject</span> <span class="o">=</span> <span class="n">hazpy</span><span class="o">.</span><span class="n">legacy</span><span class="o">.</span><span class="n">createExportObj</span><span class="p">()</span> <span class="c1"># create a template export object</span>
+<span class="n">exportObject</span><span class="p">[</span><span class="s1">&#39;study_region&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">studyRegions</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="c1"># set the study region to export</span>
+<span class="n">exportObject</span><span class="p">[</span><span class="s1">&#39;output_directory&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;C:\Users\user\disasters\event&#39;</span> <span class="c1"># set the directory for the output files</span>
+
+<span class="c1"># perform export</span>
+<span class="n">hazpy</span><span class="o">.</span><span class="n">legacy</span><span class="o">.</span><span class="n">export</span><span class="p">(</span><span class="n">exportObject</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="classes">
+<h2>Classes<a class="headerlink" href="#classes" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="hazusdb">
+<h3>HazusDB<a class="headerlink" href="#hazusdb" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="hazpy.legacy.HazusDB">
+<em class="property">class </em><code class="sig-prename descclassname">hazpy.legacy.</code><code class="sig-name descname">HazusDB</code><a class="reference internal" href="../_modules/hazpy/legacy/hazusdb.html#HazusDB"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hazpy.legacy.HazusDB" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a connection to the Hazus SQL Server database with methods to access
+databases, tables, and study regions</p>
+</dd></dl>
+
+<dl class="field-list simple">
+<dt class="field-odd">members</dt>
+<dd class="field-odd"><p></p></dd>
+</dl>
+<dl class="method">
+<dt id="hazpy.legacy.HazusDB.createConnection">
+<code class="sig-prename descclassname">HazusDB.</code><code class="sig-name descname">createConnection</code><span class="sig-paren">(</span><em class="sig-param">orm='pyodbc'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hazpy/legacy/hazusdb.html#HazusDB.createConnection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hazpy.legacy.HazusDB.createConnection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a connection object to the local Hazus SQL Server database</p>
+<dl class="simple">
+<dt>Key Argument:</dt><dd><p>orm: string - - type of connection to return (choices: ‘pyodbc’, ‘sqlalchemy’)</p>
+</dd>
+<dt>Returns:</dt><dd><p>conn: pyodbc connection</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="hazpy.legacy.HazusDB.getDatabases">
+<code class="sig-prename descclassname">HazusDB.</code><code class="sig-name descname">getDatabases</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hazpy/legacy/hazusdb.html#HazusDB.getDatabases"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hazpy.legacy.HazusDB.getDatabases" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a dataframe of all databases in your Hazus installation</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>df: pandas dataframe</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="hazpy.legacy.HazusDB.getTables">
+<code class="sig-prename descclassname">HazusDB.</code><code class="sig-name descname">getTables</code><span class="sig-paren">(</span><em class="sig-param">databaseName</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hazpy/legacy/hazusdb.html#HazusDB.getTables"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hazpy.legacy.HazusDB.getTables" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a dataframe of all tables in a database</p>
+<dl class="simple">
+<dt>Keyword Arguments:</dt><dd><p>databaseName: str – the name of the Hazus SQL Server database</p>
+</dd>
+<dt>Returns:</dt><dd><p>df: pandas dataframe</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="hazpy.legacy.HazusDB.getStudyRegions">
+<code class="sig-prename descclassname">HazusDB.</code><code class="sig-name descname">getStudyRegions</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hazpy/legacy/hazusdb.html#HazusDB.getStudyRegions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hazpy.legacy.HazusDB.getStudyRegions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a dataframe of all study regions in the local Hazus SQL Server database</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>studyRegions: pandas dataframe</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="hazpy.legacy.HazusDB.query">
+<code class="sig-prename descclassname">HazusDB.</code><code class="sig-name descname">query</code><span class="sig-paren">(</span><em class="sig-param">sql</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hazpy/legacy/hazusdb.html#HazusDB.query"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hazpy.legacy.HazusDB.query" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs a SQL query on the Hazus SQL Server database</p>
+<dl class="simple">
+<dt>Keyword Arguments:</dt><dd><p>sql: str – a T-SQL query</p>
+</dd>
+<dt>Returns:</dt><dd><p>df: pandas dataframe</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="class">
+<dt id="hazpy.legacy.HazusDB.EditSession">
+<em class="property">class </em><code class="sig-prename descclassname">hazpy.legacy.HazusDB.</code><code class="sig-name descname">EditSession</code><span class="sig-paren">(</span><em class="sig-param">database</em>, <em class="sig-param">schema</em>, <em class="sig-param">table</em><span class="sig-paren">)</span><a class="headerlink" href="#hazpy.legacy.HazusDB.EditSession" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates an edit session for a Hazus database table</p>
+<dl>
+<dt>Keyword Arguments:</dt><dd><p>database: str – the database or study region name</p>
+<p>schema: str – the schema name, typically ‘dbo’</p>
+<p>table: str – the table name you want to edit</p>
+</dd>
+<dt>Returns:</dt><dd><p>df: pandas dataframe – an editable dataframe. Use the save() method when finished.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># set up hazpy database object</span>
+<span class="n">db</span> <span class="o">=</span> <span class="n">hazpy</span><span class="o">.</span><span class="n">legacy</span><span class="o">.</span><span class="n">HazusDB</span><span class="p">()</span> <span class="c1"># initializes the HazusDB class</span>
+
+<span class="c1"># create database connection object</span>
+<span class="n">conn</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">createConnection</span><span class="p">()</span> <span class="c1"># returns a connection to the hazpy SQL Server database</span>
+
+<span class="c1"># predefined database queries</span>
+<span class="n">databases</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">getDatabases</span><span class="p">()</span> <span class="c1"># returns a dataframe of all databases in your hazpy installation</span>
+<span class="n">tables</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">getTables</span><span class="p">(</span><span class="s1">&#39;DATABASE_NAME&#39;</span><span class="p">)</span> <span class="c1"># returns all tables in a specified database</span>
+<span class="n">studyRegions</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">getStudyRegions</span><span class="p">()</span> <span class="c1"># returns a dataframe of all study regions</span>
+
+<span class="c1"># custom query</span>
+<span class="n">sql</span> <span class="o">=</span> <span class="s1">&#39;select * from DATABASE.dbo.TABLENAME&#39;</span>
+<span class="n">selection</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">sql</span><span class="p">)</span>
+
+<span class="c1"># edit a HazusDB table as a pandas dataframe</span>
+<span class="n">editSession</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">EditSession</span><span class="p">(</span><span class="s1">&#39;DATABASE_NAME&#39;</span><span class="p">,</span> <span class="s1">&#39;dbo&#39;</span><span class="p">,</span> <span class="s1">&#39;TABLE_NAME&#39;</span><span class="p">)</span>
+<span class="c1"># edit the dataframe</span>
+<span class="n">editSession</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="studyregion">
+<h3>StudyRegion<a class="headerlink" href="#studyregion" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="hazpy.legacy.StudyRegion">
+<em class="property">class </em><code class="sig-prename descclassname">hazpy.legacy.</code><code class="sig-name descname">StudyRegion</code><span class="sig-paren">(</span><em class="sig-param">studyRegion</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hazpy/legacy/studyregion.html#StudyRegion"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hazpy.legacy.StudyRegion" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a study region object using an existing study region in the local Hazus database</p>
+<dl class="simple">
+<dt>Keyword Arguments:</dt><dd><p>studyRegion: str – the name of the study region</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="field-list simple">
+<dt class="field-odd">members</dt>
+<dd class="field-odd"><p></p></dd>
+</dl>
+<dl class="method">
+<dt id="hazpy.legacy.StudyRegion.createConnection">
+<code class="sig-prename descclassname">StudyRegion.</code><code class="sig-name descname">createConnection</code><span class="sig-paren">(</span><em class="sig-param">orm='pyodbc'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hazpy/legacy/studyregion.html#StudyRegion.createConnection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hazpy.legacy.StudyRegion.createConnection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a connection object to the local Hazus SQL Server database</p>
+<dl class="simple">
+<dt>Key Argument:</dt><dd><p>orm: string – type of connection to return (choices: ‘pyodbc’, ‘sqlalchemy’)</p>
+</dd>
+<dt>Returns:</dt><dd><p>conn: pyodbc connection</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="hazpy.legacy.StudyRegion.query">
+<code class="sig-prename descclassname">StudyRegion.</code><code class="sig-name descname">query</code><span class="sig-paren">(</span><em class="sig-param">sql</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hazpy/legacy/studyregion.html#StudyRegion.query"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hazpy.legacy.StudyRegion.query" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs a SQL query on the Hazus SQL Server database</p>
+<dl class="simple">
+<dt>Keyword Arguments:</dt><dd><p>sql: str – a T-SQL query</p>
+</dd>
+<dt>Returns:</dt><dd><p>df: pandas dataframe</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="hazpy.legacy.StudyRegion.getHazardBoundary">
+<code class="sig-prename descclassname">StudyRegion.</code><code class="sig-name descname">getHazardBoundary</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hazpy/legacy/studyregion.html#StudyRegion.getHazardBoundary"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hazpy.legacy.StudyRegion.getHazardBoundary" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fetches the hazard boundary from a Hazus SQL Server database</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>df: pandas dataframe – geometry in WKT</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="hazpy.legacy.StudyRegion.getEconomicLoss">
+<code class="sig-prename descclassname">StudyRegion.</code><code class="sig-name descname">getEconomicLoss</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hazpy/legacy/studyregion.html#StudyRegion.getEconomicLoss"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hazpy.legacy.StudyRegion.getEconomicLoss" title="Permalink to this definition">¶</a></dt>
+<dd><p>Queries the total economic loss for a study region from the local Hazus SQL Server database</p>
+<blockquote>
+<div><dl class="simple">
+<dt>Returns:</dt><dd><p>df: pandas dataframe – a dataframe of economic loss</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="hazpy.legacy.StudyRegion.getTotalEconomicLoss">
+<code class="sig-prename descclassname">StudyRegion.</code><code class="sig-name descname">getTotalEconomicLoss</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hazpy/legacy/studyregion.html#StudyRegion.getTotalEconomicLoss"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hazpy.legacy.StudyRegion.getTotalEconomicLoss" title="Permalink to this definition">¶</a></dt>
+<dd><p>Queries the total economic loss summation for a study region from the local Hazus SQL Server database</p>
+<blockquote>
+<div><dl class="simple">
+<dt>Returns:</dt><dd><p>totalLoss: integer – the summation of total economic loss</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="hazpy.legacy.StudyRegion.getBuildingDamageByOccupancy">
+<code class="sig-prename descclassname">StudyRegion.</code><code class="sig-name descname">getBuildingDamageByOccupancy</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hazpy/legacy/studyregion.html#StudyRegion.getBuildingDamageByOccupancy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hazpy.legacy.StudyRegion.getBuildingDamageByOccupancy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Queries the building damage by occupancy type for a study region from the local Hazus SQL Server database</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>df: pandas dataframe – a dataframe of building damage by occupancy type</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="hazpy.legacy.StudyRegion.getBuildingDamageByType">
+<code class="sig-prename descclassname">StudyRegion.</code><code class="sig-name descname">getBuildingDamageByType</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hazpy/legacy/studyregion.html#StudyRegion.getBuildingDamageByType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hazpy.legacy.StudyRegion.getBuildingDamageByType" title="Permalink to this definition">¶</a></dt>
+<dd><p>Queries the building damage by structure type for a study region from the local Hazus SQL Server database</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>df: pandas dataframe – a dataframe of building damage by structure type</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<code class="sig-prename descclassname">StudyRegion.</code><code class="sig-name descname">getBuildingDamageByType</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hazpy/legacy/studyregion.html#StudyRegion.getBuildingDamageByType"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Queries the building damage by structure type for a study region from the local Hazus SQL Server database</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>df: pandas dataframe – a dataframe of building damage by structure type</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="hazpy.legacy.StudyRegion.getFatalities">
+<code class="sig-prename descclassname">StudyRegion.</code><code class="sig-name descname">getFatalities</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hazpy/legacy/studyregion.html#StudyRegion.getFatalities"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hazpy.legacy.StudyRegion.getFatalities" title="Permalink to this definition">¶</a></dt>
+<dd><p>Queries the fatalities for a study region from the local Hazus SQL Server database</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>df: pandas dataframe – a dataframe of fatalities</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="hazpy.legacy.StudyRegion.getDisplacedHouseholds">
+<code class="sig-prename descclassname">StudyRegion.</code><code class="sig-name descname">getDisplacedHouseholds</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hazpy/legacy/studyregion.html#StudyRegion.getDisplacedHouseholds"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hazpy.legacy.StudyRegion.getDisplacedHouseholds" title="Permalink to this definition">¶</a></dt>
+<dd><p>Queries the displaced households for a study region from the local Hazus SQL Server database</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>df: pandas dataframe – a dataframe of displaced households</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="hazpy.legacy.StudyRegion.getShelterNeeds">
+<code class="sig-prename descclassname">StudyRegion.</code><code class="sig-name descname">getShelterNeeds</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hazpy/legacy/studyregion.html#StudyRegion.getShelterNeeds"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hazpy.legacy.StudyRegion.getShelterNeeds" title="Permalink to this definition">¶</a></dt>
+<dd><p>Queries the short term shelter needs for a study region from the local Hazus SQL Server database</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>df: pandas dataframe – a dataframe of short term shelter needs</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="hazpy.legacy.StudyRegion.getDebris">
+<code class="sig-prename descclassname">StudyRegion.</code><code class="sig-name descname">getDebris</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hazpy/legacy/studyregion.html#StudyRegion.getDebris"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hazpy.legacy.StudyRegion.getDebris" title="Permalink to this definition">¶</a></dt>
+<dd><p>Queries the debris for a study region from the local Hazus SQL Server database</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>df: pandas dataframe – a dataframe of debris</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="hazpy.legacy.StudyRegion.getHazardsAnalyzed">
+<code class="sig-prename descclassname">StudyRegion.</code><code class="sig-name descname">getHazardsAnalyzed</code><span class="sig-paren">(</span><em class="sig-param">returnType='list'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hazpy/legacy/studyregion.html#StudyRegion.getHazardsAnalyzed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hazpy.legacy.StudyRegion.getHazardsAnalyzed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Queries the local Hazus SQL Server database and returns all hazards analyzed</p>
+<dl class="simple">
+<dt>Key Argument:</dt><dd><p>returnType: string – choices: ‘list’, ‘dict’</p>
+</dd>
+<dt>Returns:</dt><dd><p>df: pandas dataframe – a dataframe of the hazards analyzed</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="hazpy.legacy.StudyRegion.getHazard">
+<code class="sig-prename descclassname">StudyRegion.</code><code class="sig-name descname">getHazard</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hazpy/legacy/studyregion.html#StudyRegion.getHazard"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hazpy.legacy.StudyRegion.getHazard" title="Permalink to this definition">¶</a></dt>
+<dd><p>Queries the local Hazus SQL Server database and returns a geodataframe of the hazard</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>df: pandas dataframe – a dataframe of the hazard</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="hazpy.legacy.StudyRegion.getEssentialFacilities">
+<code class="sig-prename descclassname">StudyRegion.</code><code class="sig-name descname">getEssentialFacilities</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hazpy/legacy/studyregion.html#StudyRegion.getEssentialFacilities"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hazpy.legacy.StudyRegion.getEssentialFacilities" title="Permalink to this definition">¶</a></dt>
+<dd><p>Queries the call essential facilities for a study region in local Hazus SQL Server database</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>df: pandas dataframe – a dataframe of the essential facilities and damages</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># set up hazpy study region object</span>
+<span class="n">studyRegion</span> <span class="o">=</span> <span class="n">hazpy</span><span class="o">.</span><span class="n">legacy</span><span class="o">.</span><span class="n">StudyRegion</span><span class="p">(</span><span class="s1">&#39;STUDY_REGION_NAME&#39;</span><span class="p">)</span> <span class="c1"># initializes the StudyRegion class</span>
+
+<span class="c1"># determine the hazards analyzed in the study region</span>
+<span class="n">hazards</span> <span class="o">=</span> <span class="n">studyRegion</span><span class="o">.</span><span class="n">getHazardsAnalyzed</span><span class="p">()</span>
+
+<span class="c1"># get the hazard boundary</span>
+<span class="n">hazardBoundary</span> <span class="o">=</span> <span class="n">studyRegion</span><span class="o">.</span><span class="n">getHazardBoundary</span><span class="p">()</span>
+
+<span class="c1"># export boundary to spatial formats</span>
+<span class="n">hazardBoundary</span><span class="o">.</span><span class="n">toShapefile</span><span class="p">(</span><span class="s1">&#39;output_directory/file_name.shp&#39;</span><span class="p">)</span> <span class="c1"># to Esri Shapefile</span>
+<span class="n">hazardBoundary</span><span class="o">.</span><span class="n">toGeoJSON</span><span class="p">(</span><span class="s1">&#39;output_directory/file_name.geojson&#39;</span><span class="p">)</span> <span class="c1"># to web compatible GeoJSON</span>
+
+<span class="c1"># get data from the study region</span>
+<span class="n">econLoss</span> <span class="o">=</span> <span class="n">studyRegion</span><span class="o">.</span><span class="n">getEconomicLoss</span><span class="p">()</span> <span class="c1"># creates a StudyRegionDataFrame</span>
+
+<span class="c1"># export data to a CSV</span>
+<span class="n">econLoss</span><span class="o">.</span><span class="n">toCSV</span><span class="p">(</span><span class="s1">&#39;output_directory/file_name.csv&#39;</span><span class="p">)</span>
+
+<span class="c1"># add geometry to the StudyRegionDataFrame</span>
+<span class="n">econLossSpatial</span> <span class="o">=</span> <span class="n">econloss</span><span class="o">.</span><span class="n">addGeometry</span><span class="p">()</span>
+
+<span class="c1"># export data to spatial formats</span>
+<span class="n">econLossSpatial</span><span class="o">.</span><span class="n">toShapefile</span><span class="p">(</span><span class="s1">&#39;output_directory/file_name.shp&#39;</span><span class="p">)</span> <span class="c1"># to Esri Shapefile</span>
+<span class="n">econLossSpatial</span><span class="o">.</span><span class="n">toGeoJSON</span><span class="p">(</span><span class="s1">&#39;output_directory/file_name.geojson&#39;</span><span class="p">)</span> <span class="c1"># to web compatible GeoJSON</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="studyregiondataframe">
+<h3>StudyRegionDataFrame<a class="headerlink" href="#studyregiondataframe" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="hazpy.legacy.StudyRegionDataFrame">
+<em class="property">class </em><code class="sig-prename descclassname">hazpy.legacy.</code><code class="sig-name descname">StudyRegionDataFrame</code><span class="sig-paren">(</span><em class="sig-param">studyRegion</em>, <em class="sig-param">df</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hazpy/legacy/studyregion.html#StudyRegionDataFrame"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hazpy.legacy.StudyRegionDataFrame" title="Permalink to this definition">¶</a></dt>
+<dd><p>Intializes a study region dataframe class - A pandas dataframe extended with extra methods</p>
+<dl class="simple">
+<dt>Key Argument:</dt><dd><p>studyRegion: str – the name of the study region database
+df: pandas dataframe – a dataframe to extend as a StudyRegionDataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="field-list simple">
+<dt class="field-odd">members</dt>
+<dd class="field-odd"><p></p></dd>
+</dl>
+<dl class="method">
+<dt id="hazpy.legacy.StudyRegionDataFrame.addCensusTracts">
+<code class="sig-prename descclassname">StudyRegionDataFrame.</code><code class="sig-name descname">addCensusTracts</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hazpy/legacy/studyregion.html#StudyRegionDataFrame.addCensusTracts"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hazpy.legacy.StudyRegionDataFrame.addCensusTracts" title="Permalink to this definition">¶</a></dt>
+<dd><p>Queries the census tract geometry for a study region in local Hazus SQL Server database</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>df: pandas dataframe – a dataframe of the census geometry and fips codes</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="hazpy.legacy.StudyRegionDataFrame.addCensusBlocks">
+<code class="sig-prename descclassname">StudyRegionDataFrame.</code><code class="sig-name descname">addCensusBlocks</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hazpy/legacy/studyregion.html#StudyRegionDataFrame.addCensusBlocks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hazpy.legacy.StudyRegionDataFrame.addCensusBlocks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Queries the census block geometry for a study region in local Hazus SQL Server database</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>df: pandas dataframe – a dataframe of the census geometry and fips codes</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="hazpy.legacy.StudyRegionDataFrame.addCounties">
+<code class="sig-prename descclassname">StudyRegionDataFrame.</code><code class="sig-name descname">addCounties</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hazpy/legacy/studyregion.html#StudyRegionDataFrame.addCounties"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hazpy.legacy.StudyRegionDataFrame.addCounties" title="Permalink to this definition">¶</a></dt>
+<dd><p>Queries the county geometry for a study region in local Hazus SQL Server database</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>df: pandas dataframe – a dataframe of the census geometry and fips codes</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="hazpy.legacy.StudyRegionDataFrame.addGeometry">
+<code class="sig-prename descclassname">StudyRegionDataFrame.</code><code class="sig-name descname">addGeometry</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hazpy/legacy/studyregion.html#StudyRegionDataFrame.addGeometry"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hazpy.legacy.StudyRegionDataFrame.addGeometry" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds geometry to any HazusDB class dataframe with a census block, tract, or county id</p>
+<dl class="simple">
+<dt>Key Argument:</dt><dd><p>dataframe: pandas dataframe – a HazusDB generated dataframe with a fips column named either block, tract, or county</p>
+</dd>
+<dt>Returns:</dt><dd><p>df: pandas dataframe – a copy of the input dataframe with the geometry added</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="hazpy.legacy.StudyRegionDataFrame.toCSV">
+<code class="sig-prename descclassname">StudyRegionDataFrame.</code><code class="sig-name descname">toCSV</code><span class="sig-paren">(</span><em class="sig-param">path</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hazpy/legacy/studyregion.html#StudyRegionDataFrame.toCSV"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hazpy.legacy.StudyRegionDataFrame.toCSV" title="Permalink to this definition">¶</a></dt>
+<dd><p>Exports a StudyRegionDataFrame to a CSV</p>
+<dl class="simple">
+<dt>Key Argument:</dt><dd><p>path: str – the output directory path, file name, and extention (example: ‘C:/directory/filename.csv’)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="hazpy.legacy.StudyRegionDataFrame.toShapefile">
+<code class="sig-prename descclassname">StudyRegionDataFrame.</code><code class="sig-name descname">toShapefile</code><span class="sig-paren">(</span><em class="sig-param">path</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hazpy/legacy/studyregion.html#StudyRegionDataFrame.toShapefile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hazpy.legacy.StudyRegionDataFrame.toShapefile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Exports a StudyRegionDataFrame to an Esri Shapefile</p>
+<dl class="simple">
+<dt>Key Argument:</dt><dd><p>path: str – the output directory path, file name, and extention (example: ‘C:/directory/filename.shp’)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="hazpy.legacy.StudyRegionDataFrame.toGeoJSON">
+<code class="sig-prename descclassname">StudyRegionDataFrame.</code><code class="sig-name descname">toGeoJSON</code><span class="sig-paren">(</span><em class="sig-param">path</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hazpy/legacy/studyregion.html#StudyRegionDataFrame.toGeoJSON"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hazpy.legacy.StudyRegionDataFrame.toGeoJSON" title="Permalink to this definition">¶</a></dt>
+<dd><p>Exports a StudyRegionDataFrame to a web compatible GeoJSON</p>
+<dl class="simple">
+<dt>Key Argument:</dt><dd><p>path: str – the output directory path, file name, and extention (example: ‘C:/directory/filename.geojson’)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># prerequisite - StudyRegion</span>
+<span class="c1"># set up hazpy study region object</span>
+<span class="n">studyRegion</span> <span class="o">=</span> <span class="n">hazpy</span><span class="o">.</span><span class="n">legacy</span><span class="o">.</span><span class="n">StudyRegion</span><span class="p">(</span><span class="s1">&#39;STUDY_REGION_NAME&#39;</span><span class="p">)</span> <span class="c1"># initializes the StudyRegion class</span>
+
+<span class="c1"># get data from the study region</span>
+<span class="n">displacedHouseholds</span> <span class="o">=</span> <span class="n">studyRegion</span><span class="o">.</span><span class="n">getDisplacedHouseholds</span><span class="p">()</span> <span class="c1"># creates a StudyRegionDataFrame</span>
+
+<span class="c1"># export data to a CSV</span>
+<span class="n">displacedHouseholds</span><span class="o">.</span><span class="n">toCSV</span><span class="p">(</span><span class="s1">&#39;output_directory/file_name.csv&#39;</span><span class="p">)</span>
+
+<span class="c1"># add geometry to the StudyRegionDataFrame</span>
+<span class="n">displacedHouseholdsSpatial</span> <span class="o">=</span> <span class="n">displacedHouseholds</span><span class="o">.</span><span class="n">addGeometry</span><span class="p">()</span>
+
+<span class="c1"># export data to spatial formats</span>
+<span class="n">displacedHouseholdsSpatial</span><span class="o">.</span><span class="n">toShapefile</span><span class="p">(</span><span class="s1">&#39;output_directory/file_name.shp&#39;</span><span class="p">)</span> <span class="c1"># to Esri Shapefile</span>
+<span class="n">displacedHouseholdsSpatial</span><span class="o">.</span><span class="n">toGeoJSON</span><span class="p">(</span><span class="s1">&#39;output_directory/file_name.geojson&#39;</span><span class="p">)</span> <span class="c1"># to web compatible GeoJSON</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="exporting">
+<h3>Exporting<a class="headerlink" href="#exporting" title="Permalink to this headline">¶</a></h3>
+<p>(planned depreciation) Functionality in migration to the StudyRegion class</p>
+<dl class="class">
+<dt id="hazpy.legacy.Exporting">
+<em class="property">class </em><code class="sig-prename descclassname">hazpy.legacy.</code><code class="sig-name descname">Exporting</code><span class="sig-paren">(</span><em class="sig-param">exportObj</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hazpy/legacy/exporting/classes.html#Exporting"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hazpy.legacy.Exporting" title="Permalink to this definition">¶</a></dt>
+<dd><p>Export class for Hazus legacy. Can export CSVs, Shapefiles, PDF Reports, and Jsondatetime A combination of a date and a time.</p>
+<p>Use hazus.legacy.createExportObj() to create a base object for keyword arguments</p>
+<p>Exporting method logic follows: setup, getData, toCSV, toShapefile, toReport</p>
+<dl>
+<dt>Keyword arguments:</dt><dd><dl>
+<dt>exportObj: dictionary – {</dt><dd><p>study_region: str – name of the Hazus study region (HPR name)</p>
+<p>output_directory: str – directory location for the outputs</p>
+<p>?title: str – title on the report</p>
+<p>?meta: str – sub-title on the report (ex: Shakemap v5)</p>
+</dd>
+</dl>
+<p>}</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="field-list simple">
+<dt class="field-odd">members</dt>
+<dd class="field-odd"><p></p></dd>
+</dl>
+<dl class="method">
+<dt id="hazpy.legacy.Exporting.setup">
+<code class="sig-prename descclassname">Exporting.</code><code class="sig-name descname">setup</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hazpy/legacy/exporting/classes.html#Exporting.setup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hazpy.legacy.Exporting.setup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Establishes the connection to SQL Server</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="hazpy.legacy.Exporting.getData">
+<code class="sig-prename descclassname">Exporting.</code><code class="sig-name descname">getData</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hazpy/legacy/exporting/classes.html#Exporting.getData"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hazpy.legacy.Exporting.getData" title="Permalink to this definition">¶</a></dt>
+<dd><p>Queries and parses the data from SQL Server, preparing it for exporting</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="hazpy.legacy.Exporting.toCSV">
+<code class="sig-prename descclassname">Exporting.</code><code class="sig-name descname">toCSV</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hazpy/legacy/exporting/classes.html#Exporting.toCSV"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hazpy.legacy.Exporting.toCSV" title="Permalink to this definition">¶</a></dt>
+<dd><p>Exports the study region data to CSVs</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="hazpy.legacy.Exporting.toShapefile">
+<code class="sig-prename descclassname">Exporting.</code><code class="sig-name descname">toShapefile</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hazpy/legacy/exporting/classes.html#Exporting.toShapefile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hazpy.legacy.Exporting.toShapefile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Exports the study region data to Shapefile(s)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="hazpy.legacy.Exporting.toReport">
+<code class="sig-prename descclassname">Exporting.</code><code class="sig-name descname">toReport</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hazpy/legacy/exporting/classes.html#Exporting.toReport"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hazpy.legacy.Exporting.toReport" title="Permalink to this definition">¶</a></dt>
+<dd><p>Exports the study region data to a one-page PDF report</p>
+</dd></dl>
+
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># set up export object</span>
+<span class="n">studyRegions</span> <span class="o">=</span> <span class="n">hazpy</span><span class="o">.</span><span class="n">legacy</span><span class="o">.</span><span class="n">getStudyRegions</span><span class="p">()</span> <span class="c1"># get all study regions</span>
+<span class="n">exportObject</span> <span class="o">=</span> <span class="n">hazpy</span><span class="o">.</span><span class="n">legacy</span><span class="o">.</span><span class="n">createExportObj</span><span class="p">()</span> <span class="c1"># create a template export object</span>
+<span class="n">exportObject</span><span class="p">[</span><span class="s1">&#39;study_region&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">studyRegions</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="c1"># set the study region to export</span>
+<span class="n">exportObject</span><span class="p">[</span><span class="s1">&#39;output_directory&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;C:\Users\user\disasters\event&#39;</span> <span class="c1"># set the directory for the output files</span>
+
+<span class="c1"># initialize export class</span>
+<span class="n">export</span> <span class="o">=</span> <span class="n">hazpy</span><span class="o">.</span><span class="n">legacy</span><span class="o">.</span><span class="n">Exporting</span><span class="p">(</span><span class="n">exportObject</span><span class="p">)</span>
+
+<span class="c1"># run export class methods</span>
+<span class="n">export</span><span class="o">.</span><span class="n">setup</span><span class="p">()</span> <span class="c1"># make database connections</span>
+<span class="n">export</span><span class="o">.</span><span class="n">getData</span><span class="p">()</span> <span class="c1"># get and parse the data from SQL Server</span>
+<span class="n">export</span><span class="o">.</span><span class="n">toCSV</span><span class="p">()</span> <span class="c1"># export data to CSV</span>
+<span class="n">export</span><span class="o">.</span><span class="n">toShapefile</span><span class="p">()</span> <span class="c1"># export data to Shapefile</span>
+<span class="n">export</span><span class="o">.</span><span class="n">toReport</span><span class="p">()</span> <span class="c1"># export data to a PDF</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../Flood/index.html" class="btn btn-neutral float-right" title="Flood" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="../index.html" class="btn btn-neutral float-left" title="HazPy - Natural hazard risk assessment using Python" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, James Raines
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -1,0 +1,799 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>hazpy.legacy.studyregion &mdash; hazpy 0.0.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> hazpy
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../Legacy/index.html">Legacy</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../Flood/index.html">Flood</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../common/index.html">Common</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">hazpy</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>hazpy.legacy.studyregion</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for hazpy.legacy.studyregion</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">geopandas</span> <span class="k">as</span> <span class="nn">gpd</span>
+<span class="kn">import</span> <span class="nn">pyodbc</span> <span class="k">as</span> <span class="nn">py</span>
+<span class="kn">from</span> <span class="nn">shapely.wkt</span> <span class="k">import</span> <span class="n">loads</span>
+<span class="kn">from</span> <span class="nn">shapely.geometry.multipolygon</span> <span class="k">import</span> <span class="n">MultiPolygon</span>
+<span class="kn">from</span> <span class="nn">shapely.geometry.polygon</span> <span class="k">import</span> <span class="n">Polygon</span>
+<span class="c1"># TODO check if all geojsons are oriented correctly; if not, apply orient</span>
+<span class="c1"># try:</span>
+<span class="c1">#     from shapely.ops import orient  # version &gt;=1.7a2</span>
+<span class="c1"># except:</span>
+<span class="c1">#     from shapely.geometry.polygon import orient</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="k">import</span> <span class="n">create_engine</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+
+
+<div class="viewcode-block" id="StudyRegion"><a class="viewcode-back" href="../../../Legacy/index.html#hazpy.legacy.StudyRegion">[docs]</a><span class="k">class</span> <span class="nc">StudyRegion</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot; Creates a study region object using an existing study region in the local Hazus database</span>
+
+<span class="sd">        Keyword Arguments:</span>
+<span class="sd">            studyRegion: str -- the name of the study region</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">studyRegion</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">studyRegion</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">conn</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">createConnection</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hazards</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getHazardsAnalyzed</span><span class="p">()</span>
+
+<div class="viewcode-block" id="StudyRegion.createConnection"><a class="viewcode-back" href="../../../Legacy/index.html#hazpy.legacy.StudyRegion.createConnection">[docs]</a>    <span class="k">def</span> <span class="nf">createConnection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">orm</span><span class="o">=</span><span class="s1">&#39;pyodbc&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Creates a connection object to the local Hazus SQL Server database</span>
+
+<span class="sd">            Key Argument:</span>
+<span class="sd">                orm: string -- type of connection to return (choices: &#39;pyodbc&#39;, &#39;sqlalchemy&#39;)</span>
+<span class="sd">            Returns:</span>
+<span class="sd">                conn: pyodbc connection</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">comp_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;COMPUTERNAME&#39;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">orm</span> <span class="o">==</span> <span class="s1">&#39;pyodbc&#39;</span><span class="p">:</span>
+                <span class="n">conn</span> <span class="o">=</span> <span class="n">py</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s1">&#39;Driver=ODBC Driver 11 for SQL Server;SERVER=&#39;</span> <span class="o">+</span>
+                                  <span class="n">comp_name</span> <span class="o">+</span> <span class="s1">&#39;\HAZUSPLUSSRVR; UID=SA;PWD=Gohazusplus_02&#39;</span><span class="p">)</span>
+            <span class="c1"># TODO add sqlalchemy connection</span>
+            <span class="c1"># if orm == &#39;sqlalchemy&#39;:</span>
+            <span class="c1">#     conn = create_engine(&#39;mssql+pyodbc://SA:Gohazusplus_02@HAZUSPLUSSRVR&#39;)</span>
+            <span class="c1"># self.conn = conn</span>
+            <span class="k">return</span> <span class="n">conn</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Unexpected error:&quot;</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">raise</span></div>
+
+<div class="viewcode-block" id="StudyRegion.query"><a class="viewcode-back" href="../../../Legacy/index.html#hazpy.legacy.StudyRegion.query">[docs]</a>    <span class="k">def</span> <span class="nf">query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sql</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Performs a SQL query on the Hazus SQL Server database</span>
+
+<span class="sd">            Keyword Arguments:</span>
+<span class="sd">                sql: str -- a T-SQL query</span>
+
+<span class="sd">            Returns:</span>
+<span class="sd">                df: pandas dataframe</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_sql</span><span class="p">(</span><span class="n">sql</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">conn</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">df</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Unexpected error:&quot;</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">raise</span></div>
+
+<div class="viewcode-block" id="StudyRegion.getHazardBoundary"><a class="viewcode-back" href="../../../Legacy/index.html#hazpy.legacy.StudyRegion.getHazardBoundary">[docs]</a>    <span class="k">def</span> <span class="nf">getHazardBoundary</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Fetches the hazard boundary from a Hazus SQL Server database</span>
+
+<span class="sd">            Returns:</span>
+<span class="sd">                df: pandas dataframe -- geometry in WKT</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">sql</span> <span class="o">=</span> <span class="s1">&#39;SELECT Shape.STAsText() as geom from [</span><span class="si">%s</span><span class="s1">].[dbo].[hzboundary]&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">sql</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">df</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Unexpected error:&quot;</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">raise</span></div>
+
+<div class="viewcode-block" id="StudyRegion.getEconomicLoss"><a class="viewcode-back" href="../../../Legacy/index.html#hazpy.legacy.StudyRegion.getEconomicLoss">[docs]</a>    <span class="k">def</span> <span class="nf">getEconomicLoss</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Queries the total economic loss for a study region from the local Hazus SQL Server database</span>
+
+<span class="sd">            Returns:</span>
+<span class="sd">                df: pandas dataframe -- a dataframe of economic loss</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+
+            <span class="n">sql_dict</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s1">&#39;earthquake&#39;</span><span class="p">:</span> <span class="s2">&quot;&quot;&quot;select Tract as tract, SUM(ISNULL(TotalLoss, 0)) as EconLoss from </span><span class="si">{s}</span><span class="s2">.dbo.[eqTractEconLoss] group by [eqTractEconLoss].Tract&quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">s</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">),</span>
+                <span class="s1">&#39;flood&#39;</span><span class="p">:</span> <span class="s2">&quot;&quot;&quot;select CensusBlock as block, Sum(ISNULL(TotalLoss, 0)) as EconLoss from </span><span class="si">{s}</span><span class="s2">.dbo.flFRGBSEcLossByTotal group by CensusBlock&quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">s</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">),</span>
+                <span class="s1">&#39;hurricane&#39;</span><span class="p">:</span> <span class="s2">&quot;&quot;&quot;select TRACT as tract, SUM(ISNULL(TotLoss, 0)) as EconLoss from </span><span class="si">{s}</span><span class="s2">.dbo.[huSummaryLoss] group by Tract&quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">s</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">),</span>
+                <span class="s1">&#39;tsunami&#39;</span><span class="p">:</span> <span class="s2">&quot;&quot;&quot;select CensusBlock as block, SUM(ISNULL(TotalLoss, 0)) as EconLoss from </span><span class="si">{s}</span><span class="s2">.dbo.tsuvResDelKTotB group by CensusBlock&quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">s</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+            <span class="p">}</span>
+
+            <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">sql_dict</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">hazards</span><span class="p">[</span><span class="mi">0</span><span class="p">]])</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">StudyRegionDataFrame</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">df</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Unexpected error:&quot;</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">raise</span></div>
+
+<div class="viewcode-block" id="StudyRegion.getTotalEconomicLoss"><a class="viewcode-back" href="../../../Legacy/index.html#hazpy.legacy.StudyRegion.getTotalEconomicLoss">[docs]</a>    <span class="k">def</span> <span class="nf">getTotalEconomicLoss</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; </span>
+<span class="sd">        Queries the total economic loss summation for a study region from the local Hazus SQL Server database</span>
+
+<span class="sd">            Returns:</span>
+<span class="sd">                totalLoss: integer -- the summation of total economic loss</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">totalLoss</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getEconomicLoss</span><span class="p">()[</span><span class="s1">&#39;EconLoss&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">totalLoss</span></div>
+
+<div class="viewcode-block" id="StudyRegion.getBuildingDamageByOccupancy"><a class="viewcode-back" href="../../../Legacy/index.html#hazpy.legacy.StudyRegion.getBuildingDamageByOccupancy">[docs]</a>    <span class="k">def</span> <span class="nf">getBuildingDamageByOccupancy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Queries the building damage by occupancy type for a study region from the local Hazus SQL Server database</span>
+
+<span class="sd">            Returns:</span>
+<span class="sd">                df: pandas dataframe -- a dataframe of building damage by occupancy type</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+
+            <span class="n">sql_dict</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s1">&#39;earthquake&#39;</span><span class="p">:</span> <span class="s2">&quot;&quot;&quot;SELECT Occupancy, SUM(ISNULL(PDsNoneBC, 0))</span>
+<span class="s2">                        As NoDamage, SUM(ISNULL(PDsSlightBC, 0)) AS Affected, SUM(ISNULL(PDsModerateBC, 0))</span>
+<span class="s2">                        AS Minor, SUM(ISNULL(PDsExtensiveBC, 0)) AS Major,</span>
+<span class="s2">                        SUM(ISNULL(PDsCompleteBC, 0)) AS Destroyed FROM </span><span class="si">{s}</span><span class="s2">.dbo.[eqTractDmg]</span>
+<span class="s2">                        WHERE DmgMechType = &#39;STR&#39; GROUP BY Occupancy&quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">s</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">),</span>
+                <span class="s1">&#39;flood&#39;</span><span class="p">:</span> <span class="s2">&quot;&quot;&quot;SELECT SOccup AS Occupancy, SUM(ISNULL(TotalLoss, 0))</span>
+<span class="s2">                        AS TotalLoss, SUM(ISNULL(BuildingLoss, 0)) AS BldgLoss,</span>
+<span class="s2">                        SUM(ISNULL(ContentsLoss, 0)) AS ContLoss</span>
+<span class="s2">                        FROM </span><span class="si">{s}</span><span class="s2">.dbo.[flFRGBSEcLossBySOccup] GROUP BY SOccup&quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">s</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">),</span>
+                <span class="s1">&#39;hurricane&#39;</span><span class="p">:</span> <span class="s2">&quot;&quot;&quot;SELECT GenBldgOrGenOcc AS Occupancy,</span>
+<span class="s2">                        SUM(ISNULL(NonDamage, 0)) As NoDamage, SUM(ISNULL(MinDamage, 0)) AS Affected,</span>
+<span class="s2">                        SUM(ISNULL(ModDamage, 0)) AS Minor, SUM(ISNULL(SevDamage, 0)) AS Major,</span>
+<span class="s2">                        SUM(ISNULL(ComDamage, 0)) AS Destroyed FROM </span><span class="si">{s}</span><span class="s2">.dbo.[huSummaryDamage]</span>
+<span class="s2">                        WHERE GenBldgOrGenOcc IN(&#39;COM&#39;, &#39;AGR&#39;, &#39;GOV&#39;, &#39;EDU&#39;, &#39;REL&#39;,&#39;RES&#39;, &#39;IND&#39;)</span>
+<span class="s2">                        GROUP BY GenBldgOrGenOcc&quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">s</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">),</span>
+                <span class="s1">&#39;tsunami&#39;</span><span class="p">:</span> <span class="s2">&quot;&quot;&quot;SELECT LEFT(</span><span class="si">{s}</span><span class="s2">.dbo.tsHazNsiGbs.NsiID, 3) As Occupancy,</span>
+<span class="s2">                        COUNT(</span><span class="si">{s}</span><span class="s2">.dbo.tsHazNsiGbs.NsiID) As Total,</span>
+<span class="s2">                        COUNT(CASE WHEN </span><span class="si">{s}</span><span class="s2">.dbo.tsHazNsiGbs.ValStruct &gt; 0 AND </span><span class="si">{s}</span><span class="s2">.dbo.tsHazNsiGbs.ValCont &gt; 0 AND</span>
+<span class="s2">                        (BldgLoss/(</span><span class="si">{s}</span><span class="s2">.dbo.tsHazNsiGbs.ValStruct+</span><span class="si">{s}</span><span class="s2">.dbo.tsHazNsiGbs.ValCont))</span>
+<span class="s2">                        &lt;= 0.05 THEN 1 ELSE NULL END) As Affected,</span>
+<span class="s2">                        COUNT(CASE WHEN </span><span class="si">{s}</span><span class="s2">.dbo.tsHazNsiGbs.ValStruct &gt; 0 AND </span><span class="si">{s}</span><span class="s2">.dbo.tsHazNsiGbs.ValCont &gt; 0 AND</span>
+<span class="s2">                        (BldgLoss/(</span><span class="si">{s}</span><span class="s2">.dbo.tsHazNsiGbs.ValStruct+</span><span class="si">{s}</span><span class="s2">.dbo.tsHazNsiGbs.ValCont))</span>
+<span class="s2">                        &gt; 0.05 AND (BldgLoss/(</span><span class="si">{s}</span><span class="s2">.dbo.tsHazNsiGbs.ValStruct+</span><span class="si">{s}</span><span class="s2">.dbo.tsHazNsiGbs.ValCont))</span>
+<span class="s2">                        &lt;= 0.3 THEN 1 ELSE NULL END) As Minor,</span>
+<span class="s2">                        COUNT(CASE WHEN </span><span class="si">{s}</span><span class="s2">.dbo.tsHazNsiGbs.ValStruct &gt; 0 AND </span><span class="si">{s}</span><span class="s2">.dbo.tsHazNsiGbs.ValCont &gt; 0 AND</span>
+<span class="s2">                        (BldgLoss/(</span><span class="si">{s}</span><span class="s2">.dbo.tsHazNsiGbs.ValStruct+</span><span class="si">{s}</span><span class="s2">.dbo.tsHazNsiGbs.ValCont))</span>
+<span class="s2">                        &gt; 0.3 AND (BldgLoss/(</span><span class="si">{s}</span><span class="s2">.dbo.tsHazNsiGbs.ValStruct+</span><span class="si">{s}</span><span class="s2">.dbo.tsHazNsiGbs.ValCont))</span>
+<span class="s2">                        &lt;= 0.5 THEN 1 ELSE NULL END) As Major,</span>
+<span class="s2">                        COUNT(CASE WHEN </span><span class="si">{s}</span><span class="s2">.dbo.tsHazNsiGbs.ValStruct &gt; 0 AND </span><span class="si">{s}</span><span class="s2">.dbo.tsHazNsiGbs.ValCont &gt; 0 AND</span>
+<span class="s2">                        (BldgLoss/(</span><span class="si">{s}</span><span class="s2">.dbo.tsHazNsiGbs.ValStruct+</span><span class="si">{s}</span><span class="s2">.dbo.tsHazNsiGbs.ValCont))</span>
+<span class="s2">                        &gt; 0.5 THEN 1 ELSE NULL END) As Destroyed</span>
+<span class="s2">                        FROM </span><span class="si">{s}</span><span class="s2">.dbo.tsHazNsiGbs FULL JOIN </span><span class="si">{s}</span><span class="s2">.dbo.tsNsiGbs</span>
+<span class="s2">                        ON </span><span class="si">{s}</span><span class="s2">.dbo.tsHazNsiGbs.NsiID = </span><span class="si">{s}</span><span class="s2">.dbo.tsNsiGbs.NsiID</span>
+<span class="s2">                        FULL JOIN [</span><span class="si">{s}</span><span class="s2">].[dbo].[tsFRNsiGbs] ON </span><span class="si">{s}</span><span class="s2">.dbo.tsNsiGbs.NsiID =</span>
+<span class="s2">                        [</span><span class="si">{s}</span><span class="s2">].[dbo].[tsFRNsiGbs].NsiID WHERE </span><span class="si">{s}</span><span class="s2">.dbo.tsHazNsiGbs.NsiID IS NOT NULL</span>
+<span class="s2">                        GROUP BY LEFT(</span><span class="si">{s}</span><span class="s2">.dbo.tsHazNsiGbs.NsiID, 3)&quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">s</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+            <span class="p">}</span>
+
+            <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">sql_dict</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">hazards</span><span class="p">[</span><span class="mi">0</span><span class="p">]])</span>
+            <span class="k">return</span> <span class="n">df</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Unexpected error:&quot;</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">raise</span></div>
+
+<div class="viewcode-block" id="StudyRegion.getBuildingDamageByType"><a class="viewcode-back" href="../../../Legacy/index.html#hazpy.legacy.StudyRegion.getBuildingDamageByType">[docs]</a>    <span class="k">def</span> <span class="nf">getBuildingDamageByType</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Queries the building damage by structure type for a study region from the local Hazus SQL Server database</span>
+
+<span class="sd">            Returns:</span>
+<span class="sd">                df: pandas dataframe -- a dataframe of building damage by structure type</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+
+            <span class="n">sql_dict</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s1">&#39;earthquake&#39;</span><span class="p">:</span> <span class="s2">&quot;&quot;&quot;SELECT eqBldgType AS BldgType,</span>
+<span class="s2">                        SUM(ISNULL(PDsNoneBC, 0)) As NoDamage, SUM(ISNULL(PDsSlightBC, 0)) AS Affected,</span>
+<span class="s2">                        SUM(ISNULL(PDsModerateBC, 0)) AS Minor, SUM(ISNULL(PDsExtensiveBC, 0))</span>
+<span class="s2">                        AS Major, SUM(ISNULL(PDsCompleteBC, 0)) AS Destroyed</span>
+<span class="s2">                        FROM </span><span class="si">{s}</span><span class="s2">.dbo.[eqTractDmg] WHERE DmgMechType = &#39;STR&#39;</span>
+<span class="s2">                        GROUP BY eqBldgType&quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">s</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">),</span>
+                <span class="s1">&#39;flood&#39;</span><span class="p">:</span> <span class="s2">&quot;&quot;&quot;SELECT BldgType, SUM(ISNULL(TotalLoss, 0)) AS TotalLoss,</span>
+<span class="s2">                        SUM(ISNULL(BuildingLoss, 0)) AS BldgLoss, SUM(ISNULL(ContentsLoss, 0)) AS ContLoss</span>
+<span class="s2">                        FROM </span><span class="si">{s}</span><span class="s2">.dbo.[flFRGBSEcLossByGBldgType] GROUP BY BldgType&quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">s</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">),</span>
+                <span class="s1">&#39;hurricane&#39;</span><span class="p">:</span> <span class="s2">&quot;&quot;&quot;SELECT GenBldgOrGenOcc AS Occupancy,</span>
+<span class="s2">                        SUM(ISNULL(NonDamage, 0)) As NoDamage, SUM(ISNULL(MinDamage, 0)) AS Affected,</span>
+<span class="s2">                        SUM(ISNULL(ModDamage, 0)) AS Minor, SUM(ISNULL(SevDamage, 0)) AS Major,</span>
+<span class="s2">                        SUM(ISNULL(ComDamage, 0)) AS Destroyed FROM </span><span class="si">{s}</span><span class="s2">.dbo.[huSummaryDamage]</span>
+<span class="s2">                        WHERE GenBldgOrGenOcc IN(&#39;CONCRETE&#39;, &#39;MASONRY&#39;, &#39;STEEL&#39;, &#39;WOOD&#39;, &#39;MH&#39;)</span>
+<span class="s2">                        GROUP BY GenBldgOrGenOcc&quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">s</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">),</span>
+                <span class="s1">&#39;tsunami&#39;</span><span class="p">:</span> <span class="s2">&quot;&quot;&quot;SELECT eqBldgType AS BldgType, [Description],</span>
+<span class="s2">                        COUNT(</span><span class="si">{s}</span><span class="s2">.dbo.tsHazNsiGbs.NsiID) As Structures,</span>
+<span class="s2">                        COUNT(CASE WHEN </span><span class="si">{s}</span><span class="s2">.dbo.tsHazNsiGbs.ValStruct &gt; 0 AND </span><span class="si">{s}</span><span class="s2">.dbo.tsHazNsiGbs.ValCont &gt; 0 AND</span>
+<span class="s2">                        (BldgLoss/(</span><span class="si">{s}</span><span class="s2">.dbo.tsHazNsiGbs.ValStruct+</span><span class="si">{s}</span><span class="s2">.dbo.tsHazNsiGbs.ValCont))</span>
+<span class="s2">                        &lt;= 0.05 THEN 1 ELSE NULL END) As Affected,</span>
+<span class="s2">                        COUNT(CASE WHEN </span><span class="si">{s}</span><span class="s2">.dbo.tsHazNsiGbs.ValStruct &gt; 0 AND </span><span class="si">{s}</span><span class="s2">.dbo.tsHazNsiGbs.ValCont &gt; 0 AND</span>
+<span class="s2">                        (BldgLoss/(</span><span class="si">{s}</span><span class="s2">.dbo.tsHazNsiGbs.ValStruct+</span><span class="si">{s}</span><span class="s2">.dbo.tsHazNsiGbs.ValCont))</span>
+<span class="s2">                        &gt; 0.05 AND (BldgLoss/(</span><span class="si">{s}</span><span class="s2">.dbo.tsHazNsiGbs.ValStruct+</span><span class="si">{s}</span><span class="s2">.dbo.tsHazNsiGbs.ValCont))</span>
+<span class="s2">                        &lt;= 0.3 THEN 1 ELSE NULL END) As Minor,</span>
+<span class="s2">                        COUNT(CASE WHEN </span><span class="si">{s}</span><span class="s2">.dbo.tsHazNsiGbs.ValStruct &gt; 0 AND </span><span class="si">{s}</span><span class="s2">.dbo.tsHazNsiGbs.ValCont &gt; 0 AND</span>
+<span class="s2">                        (BldgLoss/(</span><span class="si">{s}</span><span class="s2">.dbo.tsHazNsiGbs.ValStruct+</span><span class="si">{s}</span><span class="s2">.dbo.tsHazNsiGbs.ValCont))</span>
+<span class="s2">                        &gt; 0.3 AND (BldgLoss/(</span><span class="si">{s}</span><span class="s2">.dbo.tsHazNsiGbs.ValStruct+</span><span class="si">{s}</span><span class="s2">.dbo.tsHazNsiGbs.ValCont))</span>
+<span class="s2">                        &lt;= 0.5 THEN 1 ELSE NULL END) As Major,</span>
+<span class="s2">                        COUNT(CASE WHEN </span><span class="si">{s}</span><span class="s2">.dbo.tsHazNsiGbs.ValStruct &gt; 0 AND </span><span class="si">{s}</span><span class="s2">.dbo.tsHazNsiGbs.ValCont &gt; 0 AND</span>
+<span class="s2">                        (BldgLoss/(</span><span class="si">{s}</span><span class="s2">.dbo.tsHazNsiGbs.ValStruct+</span><span class="si">{s}</span><span class="s2">.dbo.tsHazNsiGbs.ValCont))</span>
+<span class="s2">                        &gt; 0.5 THEN 1 ELSE NULL END) As Destroyed</span>
+<span class="s2">                        FROM </span><span class="si">{s}</span><span class="s2">.dbo.tsHazNsiGbs FULL JOIN </span><span class="si">{s}</span><span class="s2">.dbo.eqclBldgType</span>
+<span class="s2">                        ON </span><span class="si">{s}</span><span class="s2">.dbo.tsHazNsiGbs.EqBldgTypeID = </span><span class="si">{s}</span><span class="s2">.dbo.eqclBldgType.DisplayOrder</span>
+<span class="s2">                        FULL JOIN [</span><span class="si">{s}</span><span class="s2">].[dbo].[tsFRNsiGbs] ON </span><span class="si">{s}</span><span class="s2">.dbo.tsHazNsiGbs.NsiID =</span>
+<span class="s2">                        [</span><span class="si">{s}</span><span class="s2">].[dbo].[tsFRNsiGbs].NsiID WHERE EqBldgTypeID IS NOT NULL</span>
+<span class="s2">                        GROUP BY eqBldgType, [Description]&quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">s</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+            <span class="p">}</span>
+
+            <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">sql_dict</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">hazards</span><span class="p">[</span><span class="mi">0</span><span class="p">]])</span>
+            <span class="k">return</span> <span class="n">df</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Unexpected error:&quot;</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">raise</span></div>
+
+    <span class="k">def</span> <span class="nf">getInjuries</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Queries the injuries for a study region from the local Hazus SQL Server database</span>
+
+<span class="sd">            Returns:</span>
+<span class="sd">                df: pandas dataframe -- a dataframe of injuries</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+
+            <span class="n">sql_dict</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s1">&#39;earthquake&#39;</span><span class="p">:</span> <span class="s2">&quot;&quot;&quot;SELECT Tract as tract, SUM(CASE WHEN CasTime = &#39;N&#39; THEN Level1Injury </span>
+<span class="s2">                        ELSE 0 END) AS NightLevel1, SUM(CASE WHEN CasTime = &#39;N&#39; </span>
+<span class="s2">                        THEN Level2Injury ELSE 0 END) AS NightLevel2, SUM(CASE WHEN CasTime = &#39;N&#39; </span>
+<span class="s2">                        THEN Level3Injury ELSE 0 END) AS NiteLevel3, SUM(CASE WHEN CasTime = &#39;N&#39; </span>
+<span class="s2">                        THEN Level1Injury ELSE 0 END) AS DayLevel1,  SUM(CASE WHEN CasTime = &#39;D&#39; </span>
+<span class="s2">                        THEN Level2Injury ELSE 0 END) AS DayLevel2, SUM(CASE WHEN CasTime = &#39;D&#39; </span>
+<span class="s2">                        THEN Level3Injury ELSE 0 END) AS DayLevel3 FROM </span><span class="si">{s}</span><span class="s2">.dbo.[eqTractCasOccup] </span>
+<span class="s2">                        WHERE CasTime IN (&#39;N&#39;, &#39;D&#39;) AND InOutTot = &#39;Tot&#39; GROUP BY Tract&quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">s</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">),</span>
+                <span class="s1">&#39;flood&#39;</span><span class="p">:</span> <span class="s2">&quot;&quot;&quot; &quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">s</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">),</span>
+                <span class="s1">&#39;hurricane&#39;</span><span class="p">:</span> <span class="s2">&quot;&quot;&quot; &quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">s</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">),</span>
+                <span class="s1">&#39;tsunami&#39;</span><span class="p">:</span> <span class="s2">&quot;&quot;&quot;SELECT</span>
+<span class="s2">                        cdf.CensusBlock as block,</span>
+<span class="s2">                        SUM(cdf.InjuryDayTotal) as InjuryDayFair,</span>
+<span class="s2">                        SUM(cdg.InjuryDayTotal) As InjuryDayGood,</span>
+<span class="s2">                        SUM(cdp.InjuryDayTotal) As InjuryDayPoor,</span>
+<span class="s2">                        SUM(cnf.InjuryNightTotal) As InjuryNightFair,</span>
+<span class="s2">                        SUM(cng.InjuryNightTotal) As InjuryNightGood,</span>
+<span class="s2">                        SUM(cnp.InjuryNightTotal) As InjuryNightPoor</span>
+<span class="s2">                            FROM </span><span class="si">{s}</span><span class="s2">.dbo.tsCasualtyDayFair as cdf</span>
+<span class="s2">                                FULL JOIN </span><span class="si">{s}</span><span class="s2">.dbo.tsCasualtyDayGood as cdg</span>
+<span class="s2">                                    ON cdf.CensusBlock = cdg.CensusBlock</span>
+<span class="s2">                                FULL JOIN </span><span class="si">{s}</span><span class="s2">.dbo.tsCasualtyDayPoor as cdp</span>
+<span class="s2">                                    ON cdf.CensusBlock = cdp.CensusBlock</span>
+<span class="s2">                                FULL JOIN </span><span class="si">{s}</span><span class="s2">.dbo.tsCasualtyNightFair as cnf</span>
+<span class="s2">                                    ON cdf.CensusBlock = cnf.CensusBlock</span>
+<span class="s2">                                FULL JOIN </span><span class="si">{s}</span><span class="s2">.dbo.tsCasualtyNightGood as cng</span>
+<span class="s2">                                    ON cdf.CensusBlock = cng.CensusBlock</span>
+<span class="s2">                                FULL JOIN </span><span class="si">{s}</span><span class="s2">.dbo.tsCasualtyNightPoor as cnp</span>
+<span class="s2">                                    ON cdf.CensusBlock = cnp.CensusBlock</span>
+<span class="s2">                                group by cdf.CensusBlock&quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">s</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+            <span class="p">}</span>
+
+            <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">sql_dict</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">hazards</span><span class="p">[</span><span class="mi">0</span><span class="p">]])</span>
+            <span class="k">return</span> <span class="n">df</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Unexpected error:&quot;</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">raise</span>
+
+<div class="viewcode-block" id="StudyRegion.getFatalities"><a class="viewcode-back" href="../../../Legacy/index.html#hazpy.legacy.StudyRegion.getFatalities">[docs]</a>    <span class="k">def</span> <span class="nf">getFatalities</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Queries the fatalities for a study region from the local Hazus SQL Server database</span>
+
+<span class="sd">            Returns:</span>
+<span class="sd">                df: pandas dataframe -- a dataframe of fatalities</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+
+            <span class="n">sql_dict</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s1">&#39;earthquake&#39;</span><span class="p">:</span> <span class="s2">&quot;&quot;&quot;SELECT Tract as tract, SUM(CASE WHEN CasTime = &#39;N&#39; </span>
+<span class="s2">                        THEN Level4Injury ELSE 0 End) AS Night, SUM(CASE WHEN CasTime = &#39;D&#39; </span>
+<span class="s2">                        THEN Level4Injury ELSE 0 End) AS Day FROM </span><span class="si">{s}</span><span class="s2">.dbo.[eqTractCasOccup] </span>
+<span class="s2">                        WHERE CasTime IN (&#39;N&#39;, &#39;D&#39;) AND InOutTot = &#39;Tot&#39; GROUP BY Tract&quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">s</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">),</span>
+                <span class="s1">&#39;flood&#39;</span><span class="p">:</span> <span class="s2">&quot;&quot;&quot; &quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">s</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">),</span>
+                <span class="s1">&#39;hurricane&#39;</span><span class="p">:</span> <span class="s2">&quot;&quot;&quot; &quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">s</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">),</span>
+                <span class="s1">&#39;tsunami&#39;</span><span class="p">:</span> <span class="s2">&quot;&quot;&quot;SELECT</span>
+<span class="s2">                        cdf.CensusBlock as block,</span>
+<span class="s2">                        SUM(cdf.FatalityDayTotal) As FatalityDayFair,</span>
+<span class="s2">                        SUM(cdg.FatalityDayTotal) As FatalityDayGood,</span>
+<span class="s2">                        SUM(cdp.FatalityDayTotal) As FatalityDayPoor,</span>
+<span class="s2">                        SUM(cnf.FatalityNightTotal) As FatalityNightFair,</span>
+<span class="s2">                        SUM(cng.FatalityNightTotal) As FatalityNightGood,</span>
+<span class="s2">                        SUM(cnp.FatalityNightTotal) As FatalityNightPoor</span>
+<span class="s2">                            FROM </span><span class="si">{s}</span><span class="s2">.dbo.tsCasualtyDayFair as cdf</span>
+<span class="s2">                                FULL JOIN </span><span class="si">{s}</span><span class="s2">.dbo.tsCasualtyDayGood as cdg</span>
+<span class="s2">                                    ON cdf.CensusBlock = cdg.CensusBlock</span>
+<span class="s2">                                FULL JOIN </span><span class="si">{s}</span><span class="s2">.dbo.tsCasualtyDayPoor as cdp</span>
+<span class="s2">                                    ON cdf.CensusBlock = cdp.CensusBlock</span>
+<span class="s2">                                FULL JOIN </span><span class="si">{s}</span><span class="s2">.dbo.tsCasualtyNightFair as cnf</span>
+<span class="s2">                                    ON cdf.CensusBlock = cnf.CensusBlock</span>
+<span class="s2">                                FULL JOIN </span><span class="si">{s}</span><span class="s2">.dbo.tsCasualtyNightGood as cng</span>
+<span class="s2">                                    ON cdf.CensusBlock = cng.CensusBlock</span>
+<span class="s2">                                FULL JOIN </span><span class="si">{s}</span><span class="s2">.dbo.tsCasualtyNightPoor as cnp</span>
+<span class="s2">                                    ON cdf.CensusBlock = cnp.CensusBlock</span>
+<span class="s2">                                group by cdf.CensusBlock&quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">s</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+            <span class="p">}</span>
+
+            <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">sql_dict</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">hazards</span><span class="p">[</span><span class="mi">0</span><span class="p">]])</span>
+            <span class="k">return</span> <span class="n">df</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Unexpected error:&quot;</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">raise</span></div>
+
+<div class="viewcode-block" id="StudyRegion.getDisplacedHouseholds"><a class="viewcode-back" href="../../../Legacy/index.html#hazpy.legacy.StudyRegion.getDisplacedHouseholds">[docs]</a>    <span class="k">def</span> <span class="nf">getDisplacedHouseholds</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Queries the displaced households for a study region from the local Hazus SQL Server database</span>
+
+<span class="sd">            Returns:</span>
+<span class="sd">                df: pandas dataframe -- a dataframe of displaced households</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+
+            <span class="c1"># TODO check to see if flood is displaced households or population -- database says pop</span>
+            <span class="n">sql_dict</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s1">&#39;earthquake&#39;</span><span class="p">:</span> <span class="s2">&quot;&quot;&quot;select Tract as tract, SUM(DisplacedHouseholds) as DisplacedHouseholds from </span><span class="si">{s}</span><span class="s2">.dbo.eqTract group by Tract&quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">s</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">),</span>
+                <span class="s1">&#39;flood&#39;</span><span class="p">:</span> <span class="s2">&quot;&quot;&quot;select CensusBlock as block, SUM(DisplacedPop) as DisplacedHouseholds from </span><span class="si">{s}</span><span class="s2">.dbo.flFRShelter group by CensusBlock&quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">s</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">),</span>
+                <span class="s1">&#39;hurricane&#39;</span><span class="p">:</span> <span class="s2">&quot;&quot;&quot;select TRACT as tract, SUM(DISPLACEDHOUSEHOLDS) as DisplacedHouseholds from </span><span class="si">{s}</span><span class="s2">.dbo.huShelterResultsT group by Tract&quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">s</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">),</span>
+                <span class="s1">&#39;tsunami&#39;</span><span class="p">:</span> <span class="s2">&quot;&quot;&quot; &quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">s</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+            <span class="p">}</span>
+
+            <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">sql_dict</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">hazards</span><span class="p">[</span><span class="mi">0</span><span class="p">]])</span>
+            <span class="k">return</span> <span class="n">df</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Unexpected error:&quot;</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">raise</span></div>
+
+<div class="viewcode-block" id="StudyRegion.getShelterNeeds"><a class="viewcode-back" href="../../../Legacy/index.html#hazpy.legacy.StudyRegion.getShelterNeeds">[docs]</a>    <span class="k">def</span> <span class="nf">getShelterNeeds</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Queries the short term shelter needs for a study region from the local Hazus SQL Server database</span>
+
+<span class="sd">            Returns:</span>
+<span class="sd">                df: pandas dataframe -- a dataframe of short term shelter needs</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+
+            <span class="n">sql_dict</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s1">&#39;earthquake&#39;</span><span class="p">:</span> <span class="s2">&quot;&quot;&quot;select Tract as tract, SUM(ShortTermShelter) as ShelterNeeds from </span><span class="si">{s}</span><span class="s2">.dbo.eqTract group by Tract&quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">s</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">),</span>
+                <span class="s1">&#39;flood&#39;</span><span class="p">:</span> <span class="s2">&quot;&quot;&quot;select CensusBlock as block, SUM(ShortTermNeeds) as ShelterNeeds from </span><span class="si">{s}</span><span class="s2">.dbo.flFRShelter group by CensusBlock&quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">s</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">),</span>
+                <span class="s1">&#39;hurricane&#39;</span><span class="p">:</span> <span class="s2">&quot;&quot;&quot;select TRACT as tract, SUM(SHORTTERMSHELTERNEEDS) as ShelterNeeds from </span><span class="si">{s}</span><span class="s2">.dbo.huShelterResultsT group by Tract</span>
+<span class="s2">                        &quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">s</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">),</span>
+                <span class="s1">&#39;tsunami&#39;</span><span class="p">:</span> <span class="s2">&quot;&quot;&quot; &quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">s</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+            <span class="p">}</span>
+
+            <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">sql_dict</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">hazards</span><span class="p">[</span><span class="mi">0</span><span class="p">]])</span>
+            <span class="k">return</span> <span class="n">df</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Unexpected error:&quot;</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">raise</span></div>
+
+<div class="viewcode-block" id="StudyRegion.getDebris"><a class="viewcode-back" href="../../../Legacy/index.html#hazpy.legacy.StudyRegion.getDebris">[docs]</a>    <span class="k">def</span> <span class="nf">getDebris</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Queries the debris for a study region from the local Hazus SQL Server database</span>
+
+<span class="sd">            Returns:</span>
+<span class="sd">                df: pandas dataframe -- a dataframe of debris</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+
+            <span class="n">sql_dict</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s1">&#39;earthquake&#39;</span><span class="p">:</span> <span class="s2">&quot;&quot;&quot;select Tract as tract, SUM(DebrisW) as DebrisBW, SUM(DebrisS) as DebrisCS, SUM(DebrisTotal) as DebrisTotal from </span><span class="si">{s}</span><span class="s2">.dbo.eqTract group by Tract&quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">s</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">),</span>
+                <span class="s1">&#39;flood&#39;</span><span class="p">:</span> <span class="s2">&quot;&quot;&quot;select CensusBlock as block, (SUM(FinishTons) * 2000) as DebrisTotal from </span><span class="si">{s}</span><span class="s2">.dbo.flFRDebris group by CensusBlock&quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">s</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">),</span>
+                <span class="s1">&#39;hurricane&#39;</span><span class="p">:</span> <span class="s2">&quot;&quot;&quot;select Tract as tract, SUM(BRICKANDWOOD) as DebrisBW, SUM(CONCRETEANDSTEEL) as DebrisCS, SUM(Tree) as DebrisTree, SUM(BRICKANDWOOD + CONCRETEANDSTEEL + Tree) as DebrisTotal from </span><span class="si">{s}</span><span class="s2">.dbo.huDebrisResultsT group by Tract&quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">s</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">),</span>
+                <span class="s1">&#39;tsunami&#39;</span><span class="p">:</span> <span class="s2">&quot;&quot;&quot; &quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">s</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+            <span class="p">}</span>
+
+            <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">sql_dict</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">hazards</span><span class="p">[</span><span class="mi">0</span><span class="p">]])</span>
+            <span class="k">return</span> <span class="n">df</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Unexpected error:&quot;</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">raise</span></div>
+
+<div class="viewcode-block" id="StudyRegion.getHazardsAnalyzed"><a class="viewcode-back" href="../../../Legacy/index.html#hazpy.legacy.StudyRegion.getHazardsAnalyzed">[docs]</a>    <span class="k">def</span> <span class="nf">getHazardsAnalyzed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">returnType</span><span class="o">=</span><span class="s1">&#39;list&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Queries the local Hazus SQL Server database and returns all hazards analyzed</span>
+
+<span class="sd">            Key Argument:</span>
+<span class="sd">                returnType: string -- choices: &#39;list&#39;, &#39;dict&#39;</span>
+<span class="sd">            Returns:</span>
+<span class="sd">                df: pandas dataframe -- a dataframe of the hazards analyzed</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">sql</span> <span class="o">=</span> <span class="s2">&quot;select * from [syHazus].[dbo].[syStudyRegion] where [RegionName] = &#39;&quot;</span> <span class="o">+</span> \
+                <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s2">&quot;&#39;&quot;</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">sql</span><span class="p">)</span>
+            <span class="n">hazardsDict</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s1">&#39;earthquake&#39;</span><span class="p">:</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;HasEqHazard&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span>
+                <span class="s1">&#39;hurricane&#39;</span><span class="p">:</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;HasHuHazard&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span>
+                <span class="s1">&#39;tsunami&#39;</span><span class="p">:</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;HasTsHazard&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span>
+                <span class="s1">&#39;flood&#39;</span><span class="p">:</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;HasFlHazard&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+            <span class="p">}</span>
+            <span class="k">if</span> <span class="n">returnType</span> <span class="o">==</span> <span class="s1">&#39;dict&#39;</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">hazardsDict</span>
+            <span class="k">if</span> <span class="n">returnType</span> <span class="o">==</span> <span class="s1">&#39;list&#39;</span><span class="p">:</span>
+                <span class="n">hazardsList</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span>
+                    <span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">hazardsDict</span><span class="p">[</span><span class="n">x</span><span class="p">],</span> <span class="n">hazardsDict</span><span class="p">))</span>
+                <span class="k">return</span> <span class="n">hazardsList</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Unexpected error:&quot;</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">raise</span></div>
+
+<div class="viewcode-block" id="StudyRegion.getHazard"><a class="viewcode-back" href="../../../Legacy/index.html#hazpy.legacy.StudyRegion.getHazard">[docs]</a>    <span class="k">def</span> <span class="nf">getHazard</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Queries the local Hazus SQL Server database and returns a geodataframe of the hazard</span>
+
+<span class="sd">            Returns:</span>
+<span class="sd">                df: pandas dataframe -- a dataframe of the hazard</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+
+            <span class="n">sql_dict</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s1">&#39;earthquake&#39;</span><span class="p">:</span> <span class="s2">&quot;&quot;&quot;SELECT Tract as tract, PGA from </span><span class="si">{s}</span><span class="s2">.dbo.[eqTract]&quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">s</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">),</span>
+                <span class="s1">&#39;flood&#39;</span><span class="p">:</span> <span class="s2">&quot;&quot;&quot; &quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">s</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">),</span>
+                <span class="s1">&#39;hurricane&#39;</span><span class="p">:</span> <span class="s2">&quot;&quot;&quot; &quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">s</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">),</span>
+                <span class="s1">&#39;tsunami&#39;</span><span class="p">:</span> <span class="s2">&quot;&quot;&quot; &quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">s</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+            <span class="p">}</span>
+
+            <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">sql_dict</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">hazards</span><span class="p">[</span><span class="mi">0</span><span class="p">]])</span>
+            <span class="k">return</span> <span class="n">df</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Unexpected error:&quot;</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">raise</span></div>
+
+<div class="viewcode-block" id="StudyRegion.getEssentialFacilities"><a class="viewcode-back" href="../../../Legacy/index.html#hazpy.legacy.StudyRegion.getEssentialFacilities">[docs]</a>    <span class="k">def</span> <span class="nf">getEssentialFacilities</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Queries the call essential facilities for a study region in local Hazus SQL Server database</span>
+
+<span class="sd">            Returns:</span>
+<span class="sd">                df: pandas dataframe -- a dataframe of the essential facilities and damages</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">essential_facilities</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;CareFlty&#39;</span><span class="p">,</span> <span class="s1">&#39;EmergencyCtr&#39;</span><span class="p">,</span> <span class="s1">&#39;FireStation&#39;</span><span class="p">,</span>
+                                    <span class="s1">&#39;PoliceStation&#39;</span><span class="p">,</span> <span class="s1">&#39;School&#39;</span><span class="p">,</span> <span class="s1">&#39;AirportFlty&#39;</span><span class="p">,</span> <span class="s1">&#39;BusFlty&#39;</span><span class="p">,</span> <span class="s1">&#39;FerryFlty&#39;</span><span class="p">,</span>
+                                    <span class="s1">&#39;HighwayBridge&#39;</span><span class="p">,</span> <span class="s1">&#39;HighwayTunnel&#39;</span><span class="p">,</span> <span class="s1">&#39;LightRailBridge&#39;</span><span class="p">,</span> <span class="s1">&#39;LightRailFlty&#39;</span><span class="p">,</span>
+                                    <span class="s1">&#39;LightRailTunnel&#39;</span><span class="p">,</span> <span class="s1">&#39;PortFlty&#39;</span><span class="p">,</span> <span class="s1">&#39;RailFlty&#39;</span><span class="p">,</span> <span class="s1">&#39;RailwayBridge&#39;</span><span class="p">,</span>
+                                    <span class="s1">&#39;RailwayTunnel&#39;</span><span class="p">,</span> <span class="s1">&#39;Runway&#39;</span><span class="p">,</span> <span class="s1">&#39;ElectricPowerFlty&#39;</span><span class="p">,</span> <span class="s1">&#39;CommunicationFlty&#39;</span><span class="p">,</span>
+                                    <span class="s1">&#39;NaturalGasFlty&#39;</span><span class="p">,</span> <span class="s1">&#39;OilFlty&#39;</span><span class="p">,</span> <span class="s1">&#39;PotableWaterFlty&#39;</span><span class="p">,</span> <span class="s1">&#39;WasteWaterFlty&#39;</span><span class="p">,</span>
+                                    <span class="s1">&#39;Dams&#39;</span><span class="p">,</span> <span class="s1">&#39;Military&#39;</span><span class="p">,</span> <span class="s1">&#39;NuclearFlty&#39;</span><span class="p">,</span> <span class="s1">&#39;HighwaySegment&#39;</span><span class="p">,</span> <span class="s1">&#39;LightRailSegment&#39;</span><span class="p">,</span>
+                                    <span class="s1">&#39;RailwaySegment&#39;</span><span class="p">,</span> <span class="s1">&#39;NaturalGasPl&#39;</span><span class="p">,</span> <span class="s1">&#39;OilPl&#39;</span><span class="p">,</span> <span class="s1">&#39;WasteWaterPl&#39;</span><span class="p">,</span> <span class="s1">&#39;Levees&#39;</span><span class="p">]</span>
+
+            <span class="n">sql</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;SELECT CountyFips as county, CountyName as name, Shape.STAsText() AS Shape FROM </span><span class="si">{s}</span><span class="s2">.dbo.hzCounty&quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">s</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+
+            <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">sql</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">df</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Unexpected error:&quot;</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">raise</span></div></div>
+
+
+<div class="viewcode-block" id="StudyRegionDataFrame"><a class="viewcode-back" href="../../../Legacy/index.html#hazpy.legacy.StudyRegionDataFrame">[docs]</a><span class="k">class</span> <span class="nc">StudyRegionDataFrame</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Intializes a study region dataframe class - A pandas dataframe extended with extra methods</span>
+
+<span class="sd">        Key Argument:</span>
+<span class="sd">            studyRegion: str -- the name of the study region database</span>
+<span class="sd">            df: pandas dataframe -- a dataframe to extend as a StudyRegionDataFrame</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">studyRegion</span><span class="p">,</span> <span class="n">df</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">studyRegion</span> <span class="o">=</span> <span class="n">studyRegion</span><span class="o">.</span><span class="n">name</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">studyRegion</span> <span class="o">=</span> <span class="n">studyRegion</span><span class="o">.</span><span class="n">studyRegion</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">conn</span> <span class="o">=</span> <span class="n">studyRegion</span><span class="o">.</span><span class="n">conn</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">query</span> <span class="o">=</span> <span class="n">studyRegion</span><span class="o">.</span><span class="n">query</span>
+
+<div class="viewcode-block" id="StudyRegionDataFrame.addCensusTracts"><a class="viewcode-back" href="../../../Legacy/index.html#hazpy.legacy.StudyRegionDataFrame.addCensusTracts">[docs]</a>    <span class="k">def</span> <span class="nf">addCensusTracts</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Queries the census tract geometry for a study region in local Hazus SQL Server database</span>
+
+<span class="sd">            Returns:</span>
+<span class="sd">                df: pandas dataframe -- a dataframe of the census geometry and fips codes</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+
+            <span class="n">sql</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;SELECT Tract as tract, Shape.STAsText() AS Shape FROM </span><span class="si">{s}</span><span class="s2">.dbo.hzTract&quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">s</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">studyRegion</span><span class="p">)</span>
+
+            <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">sql</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">StudyRegionDataFrame</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Unexpected error:&quot;</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">raise</span></div>
+
+<div class="viewcode-block" id="StudyRegionDataFrame.addCensusBlocks"><a class="viewcode-back" href="../../../Legacy/index.html#hazpy.legacy.StudyRegionDataFrame.addCensusBlocks">[docs]</a>    <span class="k">def</span> <span class="nf">addCensusBlocks</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Queries the census block geometry for a study region in local Hazus SQL Server database</span>
+
+<span class="sd">            Returns:</span>
+<span class="sd">                df: pandas dataframe -- a dataframe of the census geometry and fips codes</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+
+            <span class="n">sql</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;SELECT CensusBlock as block, Shape.STAsText() AS Shape FROM </span><span class="si">{s}</span><span class="s2">.dbo.hzCensusBlock&quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">s</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">studyRegion</span><span class="p">)</span>
+
+            <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">sql</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">StudyRegionDataFrame</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Unexpected error:&quot;</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">raise</span></div>
+
+<div class="viewcode-block" id="StudyRegionDataFrame.addCounties"><a class="viewcode-back" href="../../../Legacy/index.html#hazpy.legacy.StudyRegionDataFrame.addCounties">[docs]</a>    <span class="k">def</span> <span class="nf">addCounties</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Queries the county geometry for a study region in local Hazus SQL Server database</span>
+
+<span class="sd">            Returns:</span>
+<span class="sd">                df: pandas dataframe -- a dataframe of the census geometry and fips codes</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+
+            <span class="n">sql</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;SELECT CountyFips as county, CountyName as name, Shape.STAsText() AS Shape FROM </span><span class="si">{s}</span><span class="s2">.dbo.hzCounty&quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">s</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">studyRegion</span><span class="p">)</span>
+
+            <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">sql</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">StudyRegionDataFrame</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Unexpected error:&quot;</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">raise</span></div>
+
+<div class="viewcode-block" id="StudyRegionDataFrame.addGeometry"><a class="viewcode-back" href="../../../Legacy/index.html#hazpy.legacy.StudyRegionDataFrame.addGeometry">[docs]</a>    <span class="k">def</span> <span class="nf">addGeometry</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Adds geometry to any HazusDB class dataframe with a census block, tract, or county id</span>
+
+<span class="sd">            Key Argument:</span>
+<span class="sd">                dataframe: pandas dataframe -- a HazusDB generated dataframe with a fips column named either block, tract, or county</span>
+<span class="sd">            Returns:</span>
+<span class="sd">                df: pandas dataframe -- a copy of the input dataframe with the geometry added</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s1">&#39;block&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+                <span class="n">geomdf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">addCensusBlocks</span><span class="p">()</span>
+                <span class="n">df</span> <span class="o">=</span> <span class="n">geomdf</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="s1">&#39;block&#39;</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s1">&#39;inner&#39;</span><span class="p">)</span>
+                <span class="n">df</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span>
+                    <span class="n">x</span> <span class="k">if</span> <span class="n">x</span> <span class="o">!=</span> <span class="s1">&#39;Shape&#39;</span> <span class="k">else</span> <span class="s1">&#39;geometry&#39;</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">]</span>
+                <span class="k">return</span> <span class="n">StudyRegionDataFrame</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="s1">&#39;tract&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+                <span class="n">geomdf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">addCensusTracts</span><span class="p">()</span>
+                <span class="n">df</span> <span class="o">=</span> <span class="n">geomdf</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="s1">&#39;tract&#39;</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s1">&#39;inner&#39;</span><span class="p">)</span>
+                <span class="n">df</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span>
+                    <span class="n">x</span> <span class="k">if</span> <span class="n">x</span> <span class="o">!=</span> <span class="s1">&#39;Shape&#39;</span> <span class="k">else</span> <span class="s1">&#39;geometry&#39;</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">]</span>
+                <span class="k">return</span> <span class="n">StudyRegionDataFrame</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="s1">&#39;county&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+                <span class="n">geomdf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">addCounties</span><span class="p">()</span>
+                <span class="n">df</span> <span class="o">=</span> <span class="n">geomdf</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="s1">&#39;county&#39;</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s1">&#39;inner&#39;</span><span class="p">)</span>
+                <span class="n">df</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span>
+                    <span class="n">x</span> <span class="k">if</span> <span class="n">x</span> <span class="o">!=</span> <span class="s1">&#39;Shape&#39;</span> <span class="k">else</span> <span class="s1">&#39;geometry&#39;</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">]</span>
+                <span class="k">return</span> <span class="n">StudyRegionDataFrame</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span>
+                    <span class="s1">&#39;Unable to find the column name block, tract, or county in the dataframe input&#39;</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Unexpected error:&quot;</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">raise</span></div>
+
+<div class="viewcode-block" id="StudyRegionDataFrame.toCSV"><a class="viewcode-back" href="../../../Legacy/index.html#hazpy.legacy.StudyRegionDataFrame.toCSV">[docs]</a>    <span class="k">def</span> <span class="nf">toCSV</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Exports a StudyRegionDataFrame to a CSV</span>
+
+<span class="sd">            Key Argument:</span>
+<span class="sd">                path: str -- the output directory path, file name, and extention (example: &#39;C:/directory/filename.csv&#39;)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="StudyRegionDataFrame.toShapefile"><a class="viewcode-back" href="../../../Legacy/index.html#hazpy.legacy.StudyRegionDataFrame.toShapefile">[docs]</a>    <span class="k">def</span> <span class="nf">toShapefile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Exports a StudyRegionDataFrame to an Esri Shapefile</span>
+
+<span class="sd">            Key Argument:</span>
+<span class="sd">                path: str -- the output directory path, file name, and extention (example: &#39;C:/directory/filename.shp&#39;)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s1">&#39;geometry&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+                <span class="bp">self</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">addGeometry</span><span class="p">()</span>
+            <span class="bp">self</span><span class="p">[</span><span class="s1">&#39;geometry&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="s1">&#39;geometry&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
+                <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">loads</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+            <span class="n">gdf</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">geometry</span><span class="o">=</span><span class="s1">&#39;geometry&#39;</span><span class="p">)</span>
+            <span class="n">gdf</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">driver</span><span class="o">=</span><span class="s1">&#39;ESRI Shapefile&#39;</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Unexpected error:&quot;</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">raise</span></div>
+
+<div class="viewcode-block" id="StudyRegionDataFrame.toGeoJSON"><a class="viewcode-back" href="../../../Legacy/index.html#hazpy.legacy.StudyRegionDataFrame.toGeoJSON">[docs]</a>    <span class="k">def</span> <span class="nf">toGeoJSON</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Exports a StudyRegionDataFrame to a web compatible GeoJSON</span>
+
+<span class="sd">            Key Argument:</span>
+<span class="sd">                path: str -- the output directory path, file name, and extention (example: &#39;C:/directory/filename.geojson&#39;)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s1">&#39;geometry&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+                <span class="bp">self</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">addGeometry</span><span class="p">()</span>
+            <span class="bp">self</span><span class="p">[</span><span class="s1">&#39;geometry&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="s1">&#39;geometry&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">loads</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+            <span class="n">gdf</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">geometry</span><span class="o">=</span><span class="s1">&#39;geometry&#39;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">gdf</span><span class="p">[</span><span class="s1">&#39;geometry&#39;</span><span class="p">])):</span>
+                <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">gdf</span><span class="p">[</span><span class="s1">&#39;geometry&#39;</span><span class="p">][</span><span class="n">index</span><span class="p">])</span> <span class="o">==</span> <span class="n">Polygon</span><span class="p">:</span>
+                    <span class="n">gdf</span><span class="p">[</span><span class="s1">&#39;geometry&#39;</span><span class="p">][</span><span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="n">MultiPolygon</span><span class="p">(</span>
+                        <span class="p">[</span><span class="n">gdf</span><span class="p">[</span><span class="s1">&#39;geometry&#39;</span><span class="p">][</span><span class="n">index</span><span class="p">]])</span>
+            <span class="c1"># gdf[&#39;geometry&#39;].apply(orient, args=(1,))</span>
+            <span class="n">gdf</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">driver</span><span class="o">=</span><span class="s1">&#39;GeoJSON&#39;</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Unexpected error:&quot;</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">raise</span></div></div>
+
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">def essentialFacilities</span>
+<span class="sd">def transportation</span>
+<span class="sd">def agriculture</span>
+<span class="sd">def vehicles?</span>
+<span class="sd">def GBS?</span>
+<span class="sd">&quot;&quot;&quot;</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, James Raines
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -1,0 +1,284 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>hazpy.legacy.exporting.methods &mdash; hazpy 0.0.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../../index.html" class="icon icon-home"> hazpy
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../Legacy/index.html">Legacy</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../Flood/index.html">Flood</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../common/index.html">Common</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">hazpy</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../../index.html">Module code</a> &raquo;</li>
+        
+      <li>hazpy.legacy.exporting.methods</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for hazpy.legacy.exporting.methods</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">.Setup_Connection</span> <span class="k">import</span> <span class="n">setup</span>
+<span class="kn">from</span> <span class="nn">importlib</span> <span class="k">import</span> <span class="n">import_module</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">...common</span> <span class="k">import</span> <span class="n">Logger</span>
+
+
+<span class="k">def</span> <span class="nf">initLogger</span><span class="p">(</span><span class="n">output_directory</span><span class="p">,</span> <span class="n">study_region</span><span class="p">):</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="n">output_directory</span> <span class="o">+</span> <span class="s1">&#39;/&#39;</span> <span class="o">+</span> <span class="n">study_region</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+    <span class="n">logger</span> <span class="o">=</span> <span class="n">Logger</span><span class="p">()</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">logger</span>
+
+
+<span class="k">def</span> <span class="nf">createExportObj</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Creates a dictionary to be used in the hazus.legacy.export method and hazus.legacy.Exporting class</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        exportObj: dict -- opt fields are boolean and decide options for exports. The rest of the fields are strings.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">exportObj</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;opt_csv&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="s1">&#39;opt_shp&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="s1">&#39;opt_report&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="s1">&#39;opt_json&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="s1">&#39;study_region&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;meta&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;output_directory&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="n">exportObj</span>
+
+
+<span class="k">def</span> <span class="nf">export</span><span class="p">(</span><span class="n">exportObj</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Exports data from Hazus legacy. Can export CSVs, Shapefiles, PDF Reports, and Json \n</span>
+<span class="sd">    Use hazus.legacy.createExportObj() to create a base object for keyword arguments \n</span>
+
+<span class="sd">    Keyword arguments:</span>
+<span class="sd">        exportObj: dictionary -- { \n</span>
+<span class="sd">            opt_csv: boolean -- export CSVs, \n</span>
+<span class="sd">            opt_shp: boolean -- export Shapefile(s), \n</span>
+<span class="sd">            opt_report: boolean -- export report, \n</span>
+<span class="sd">            opt_json: boolean -- export Json, \n</span>
+<span class="sd">            study_region: str -- name of the Hazus study region (HPR name), \n</span>
+<span class="sd">            ?title: str -- title on the report, \n</span>
+<span class="sd">            ?meta: str -- sub-title on the report (ex: Shakemap v5), \n</span>
+<span class="sd">            output_directory: str -- directory location for the outputs \n</span>
+<span class="sd">        }</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">logger</span> <span class="o">=</span> <span class="n">initLogger</span><span class="p">(</span>
+        <span class="n">exportObj</span><span class="p">[</span><span class="s1">&#39;output_directory&#39;</span><span class="p">],</span> <span class="n">exportObj</span><span class="p">[</span><span class="s1">&#39;study_region&#39;</span><span class="p">])</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="s1">&#39;Establishing connection to SQL Server&#39;</span><span class="p">)</span>
+    <span class="n">comp_name</span><span class="p">,</span> <span class="n">cnxn</span><span class="p">,</span> <span class="n">date</span><span class="p">,</span> <span class="n">modules</span> <span class="o">=</span> <span class="n">setup</span><span class="p">(</span><span class="n">exportObj</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="s1">&#39;Connection established and modules identified&#39;</span><span class="p">)</span>
+    <span class="n">exportObj</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;created&#39;</span><span class="p">:</span> <span class="n">date</span><span class="p">})</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="s1">&#39;Importing result module&#39;</span><span class="p">)</span>
+    <span class="n">result_module</span> <span class="o">=</span> <span class="n">import_module</span><span class="p">(</span>
+        <span class="s1">&#39;.&#39;</span><span class="o">+</span><span class="n">modules</span><span class="p">[</span><span class="s1">&#39;result_module&#39;</span><span class="p">],</span> <span class="n">package</span><span class="o">=</span><span class="s1">&#39;hazus.legacy.exporting.results&#39;</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="s1">&#39;Result module imported&#39;</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="s1">&#39;Fetching data from SQL Server&#39;</span><span class="p">)</span>
+    <span class="n">hazus_results_dict</span><span class="p">,</span> <span class="n">subcounty_results</span><span class="p">,</span> <span class="n">county_results</span><span class="p">,</span> <span class="n">damaged_essential_facilities</span> <span class="o">=</span> <span class="n">result_module</span><span class="o">.</span><span class="n">read_sql</span><span class="p">(</span>
+        <span class="n">comp_name</span><span class="p">,</span> <span class="n">cnxn</span><span class="p">,</span> <span class="n">exportObj</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="s1">&#39;SQL quiries returned and data parsed&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">exportObj</span><span class="p">[</span><span class="s1">&#39;opt_csv&#39;</span><span class="p">]:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="s1">&#39;Exporting CSVs&#39;</span><span class="p">)</span>
+        <span class="n">result_module</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">hazus_results_dict</span><span class="p">,</span> <span class="n">subcounty_results</span><span class="p">,</span>
+                             <span class="n">county_results</span><span class="p">,</span> <span class="n">damaged_essential_facilities</span><span class="p">,</span> <span class="n">exportObj</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="s1">&#39;CSVs saved&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">exportObj</span><span class="p">[</span><span class="s1">&#39;opt_shp&#39;</span><span class="p">]:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="s1">&#39;Exporting Shapefile(s)&#39;</span><span class="p">)</span>
+        <span class="n">gdf</span> <span class="o">=</span> <span class="n">result_module</span><span class="o">.</span><span class="n">to_shp</span><span class="p">(</span>
+            <span class="n">exportObj</span><span class="p">,</span> <span class="n">hazus_results_dict</span><span class="p">,</span> <span class="n">subcounty_results</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="s1">&#39;Shapefile(s) saved&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">exportObj</span><span class="p">[</span><span class="s1">&#39;opt_report&#39;</span><span class="p">]:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="nb">len</span><span class="p">(</span><span class="n">gdf</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="s1">&#39;Creating gdf for report&#39;</span><span class="p">)</span>
+            <span class="n">gdf</span> <span class="o">=</span> <span class="n">result_module</span><span class="o">.</span><span class="n">to_shp</span><span class="p">(</span>
+                <span class="n">exportObj</span><span class="p">,</span> <span class="n">hazus_results_dict</span><span class="p">,</span> <span class="n">subcounty_results</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="s1">&#39;Gdf created&#39;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="s1">&#39;Importing report module&#39;</span><span class="p">)</span>
+        <span class="n">report_module</span> <span class="o">=</span> <span class="n">import_module</span><span class="p">(</span>
+            <span class="s1">&#39;.&#39;</span><span class="o">+</span><span class="n">modules</span><span class="p">[</span><span class="s1">&#39;report_module&#39;</span><span class="p">],</span> <span class="n">package</span><span class="o">=</span><span class="s1">&#39;hazus.legacy.exporting.reports&#39;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="s1">&#39;Report module imported&#39;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="s1">&#39;Creating and exporting report&#39;</span><span class="p">)</span>
+        <span class="n">report_module</span><span class="o">.</span><span class="n">generate_report</span><span class="p">(</span>
+            <span class="n">gdf</span><span class="p">,</span> <span class="n">hazus_results_dict</span><span class="p">,</span> <span class="n">subcounty_results</span><span class="p">,</span> <span class="n">county_results</span><span class="p">,</span> <span class="n">exportObj</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">destroy</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, James Raines
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

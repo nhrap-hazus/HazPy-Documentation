@@ -1,0 +1,234 @@
+.. hazpy documentation master file, created by
+   sphinx-quickstart on Mon Nov  4 11:45:27 2019.
+   You can adapt this file completely to your liking, but it should at least
+   contain the root `toctree` directive.
+
+Legacy
+=================================
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Contents:
+
+HazPy Legacy methods and classes. This module interacts with and builds upon the hazpy Legacy desktop software.
+
+.. code-block::
+
+    hazpy.legacy
+
+Methods
+---------------------------------
+
+getStudyRegions
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. automethod:: hazpy.legacy.getStudyRegions
+:members:
+
+Example:
+
+.. code-block::
+
+    # get list of study regions
+    studyRegions = hazpy.legacy.getStudyRegions()
+
+createExportObj
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. automethod:: hazpy.legacy.createExportObj
+:members:
+
+Example:
+
+.. code-block::
+
+    # create a template export object
+    exportObject = hazpy.legacy.createExportObj()
+
+    # modify required keys
+    exportObject['study_region'] = 'My_Eq_StudyRegionName' # set the study region to export
+    exportObject['output_directory'] = r'C:\Users\user\disasters\event' # set the directory for the output files
+
+    # modify what you will export (True will export and False will not export)
+    exportObject['opt_csv'] = True # export data as CSVs
+    exportObject['opt_shp'] = True # export data as Shapefiles
+    exportObject['opt_report'] = True # export high level report
+    exportObject['opt_json'] = True # export data as json
+
+    # modify optional report keys
+    exportObject['title'] = 'Kiholo Earthquake M6.4' # report title
+    exportObject['meta'] = 'Shakemap version 5 US' # subtitle/meta data for the report
+
+export
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. automethod:: hazpy.legacy.export
+:members:
+
+Example:
+
+.. code-block::
+
+    # set up export object
+    studyRegions = hazpy.legacy.getStudyRegions() # get all study regions
+    exportObject = hazpy.legacy.createExportObj() # create a template export object
+    exportObject['study_region'] = studyRegions[0] # set the study region to export
+    exportObject['output_directory'] = r'C:\Users\user\disasters\event' # set the directory for the output files
+
+    # perform export
+    hazpy.legacy.export(exportObject)
+
+Classes
+---------------------------------
+
+HazusDB
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. autoclass:: hazpy.legacy.HazusDB
+:members:
+.. automethod:: hazpy.legacy.HazusDB.createConnection
+.. automethod:: hazpy.legacy.HazusDB.getDatabases
+.. automethod:: hazpy.legacy.HazusDB.getTables
+.. automethod:: hazpy.legacy.HazusDB.getStudyRegions
+.. automethod:: hazpy.legacy.HazusDB.query
+.. autoclass:: hazpy.legacy.HazusDB.EditSession
+
+Example:
+
+.. code-block::
+
+    # set up hazpy database object
+    db = hazpy.legacy.HazusDB() # initializes the HazusDB class
+
+    # create database connection object
+    conn = db.createConnection() # returns a connection to the hazpy SQL Server database
+
+    # predefined database queries
+    databases = db.getDatabases() # returns a dataframe of all databases in your hazpy installation
+    tables = db.getTables('DATABASE_NAME') # returns all tables in a specified database
+    studyRegions = db.getStudyRegions() # returns a dataframe of all study regions
+
+    # custom query
+    sql = 'select * from DATABASE.dbo.TABLENAME'
+    selection = db.query(sql)
+
+    # edit a HazusDB table as a pandas dataframe
+    editSession = db.EditSession('DATABASE_NAME', 'dbo', 'TABLE_NAME')
+    # edit the dataframe
+    editSession.save()
+
+    
+StudyRegion
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. autoclass:: hazpy.legacy.StudyRegion
+:members:
+.. automethod:: hazpy.legacy.StudyRegion.createConnection
+.. automethod:: hazpy.legacy.StudyRegion.query
+.. automethod:: hazpy.legacy.StudyRegion.getHazardBoundary
+.. automethod:: hazpy.legacy.StudyRegion.getEconomicLoss
+.. automethod:: hazpy.legacy.StudyRegion.getTotalEconomicLoss
+.. automethod:: hazpy.legacy.StudyRegion.getBuildingDamageByOccupancy
+.. automethod:: hazpy.legacy.StudyRegion.getBuildingDamageByType
+.. automethod:: hazpy.legacy.StudyRegion.getBuildingDamageByType
+.. automethod:: hazpy.legacy.StudyRegion.getFatalities
+.. automethod:: hazpy.legacy.StudyRegion.getDisplacedHouseholds
+.. automethod:: hazpy.legacy.StudyRegion.getShelterNeeds
+.. automethod:: hazpy.legacy.StudyRegion.getDebris
+.. automethod:: hazpy.legacy.StudyRegion.getHazardsAnalyzed
+.. automethod:: hazpy.legacy.StudyRegion.getHazard
+.. automethod:: hazpy.legacy.StudyRegion.getEssentialFacilities
+
+Example:
+
+.. code-block::
+
+    # set up hazpy study region object
+    studyRegion = hazpy.legacy.StudyRegion('STUDY_REGION_NAME') # initializes the StudyRegion class
+
+    # determine the hazards analyzed in the study region
+    hazards = studyRegion.getHazardsAnalyzed()
+
+    # get the hazard boundary
+    hazardBoundary = studyRegion.getHazardBoundary()
+
+    # export boundary to spatial formats
+    hazardBoundary.toShapefile('output_directory/file_name.shp') # to Esri Shapefile
+    hazardBoundary.toGeoJSON('output_directory/file_name.geojson') # to web compatible GeoJSON
+
+    # get data from the study region
+    econLoss = studyRegion.getEconomicLoss() # creates a StudyRegionDataFrame
+
+    # export data to a CSV
+    econLoss.toCSV('output_directory/file_name.csv')
+
+    # add geometry to the StudyRegionDataFrame
+    econLossSpatial = econloss.addGeometry()
+
+    # export data to spatial formats
+    econLossSpatial.toShapefile('output_directory/file_name.shp') # to Esri Shapefile
+    econLossSpatial.toGeoJSON('output_directory/file_name.geojson') # to web compatible GeoJSON
+
+
+StudyRegionDataFrame
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. autoclass:: hazpy.legacy.StudyRegionDataFrame
+:members:
+.. automethod:: hazpy.legacy.StudyRegionDataFrame.addCensusTracts
+.. automethod:: hazpy.legacy.StudyRegionDataFrame.addCensusBlocks
+.. automethod:: hazpy.legacy.StudyRegionDataFrame.addCounties
+.. automethod:: hazpy.legacy.StudyRegionDataFrame.addGeometry
+.. automethod:: hazpy.legacy.StudyRegionDataFrame.toCSV
+.. automethod:: hazpy.legacy.StudyRegionDataFrame.toShapefile
+.. automethod:: hazpy.legacy.StudyRegionDataFrame.toGeoJSON
+
+Example:
+
+.. code-block::
+
+    # prerequisite - StudyRegion
+    # set up hazpy study region object
+    studyRegion = hazpy.legacy.StudyRegion('STUDY_REGION_NAME') # initializes the StudyRegion class
+
+    # get data from the study region
+    displacedHouseholds = studyRegion.getDisplacedHouseholds() # creates a StudyRegionDataFrame
+
+    # export data to a CSV
+    displacedHouseholds.toCSV('output_directory/file_name.csv')
+
+    # add geometry to the StudyRegionDataFrame
+    displacedHouseholdsSpatial = displacedHouseholds.addGeometry()
+
+    # export data to spatial formats
+    displacedHouseholdsSpatial.toShapefile('output_directory/file_name.shp') # to Esri Shapefile
+    displacedHouseholdsSpatial.toGeoJSON('output_directory/file_name.geojson') # to web compatible GeoJSON
+
+Exporting
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+(planned depreciation) Functionality in migration to the StudyRegion class
+
+.. autoclass:: hazpy.legacy.Exporting
+
+
+:members:
+.. automethod:: hazpy.legacy.Exporting.setup
+.. automethod:: hazpy.legacy.Exporting.getData
+.. automethod:: hazpy.legacy.Exporting.toCSV
+.. automethod:: hazpy.legacy.Exporting.toShapefile
+.. automethod:: hazpy.legacy.Exporting.toReport
+
+Example:
+
+.. code-block::
+
+    # set up export object
+    studyRegions = hazpy.legacy.getStudyRegions() # get all study regions
+    exportObject = hazpy.legacy.createExportObj() # create a template export object
+    exportObject['study_region'] = studyRegions[0] # set the study region to export
+    exportObject['output_directory'] = r'C:\Users\user\disasters\event' # set the directory for the output files
+
+    # initialize export class
+    export = hazpy.legacy.Exporting(exportObject)
+
+    # run export class methods
+    export.setup() # make database connections
+    export.getData() # get and parse the data from SQL Server
+    export.toCSV() # export data to CSV
+    export.toShapefile() # export data to Shapefile
+    export.toReport() # export data to a PDF
